@@ -3,6 +3,12 @@
 **SKTiled** is a simple library for using [Tiled](http://www.mapeditor.org) files with Apple's SpriteKit, allowing the creation of game assets from .tmx files. Inspired by [TilemapKit](http://tilemapkit.com) and written purely in Swift 2.0, I began working on this for a project after the development of TilemapKit was halted. While initially created as an exercise in learning Apple's new programming language, I've decided to open-source it in case others find it helpful.  
 
 
+For Swift 2.3. See [this branch](https://github.com/mfessenden/SKTiled/tree/iOS10) for Swift 3 version.
+
+![](https://img.shields.io/badge/Swift-2.3-brightgreen.svg)
+[![Build Status](https://travis-ci.org/mfessenden/SKTiled.svg?branch=master)](https://travis-ci.org/mfessenden/SKTiled)
+
+
 ##Installation
 
 Simply drag the *SKTiled* directory into your Xcode project, and add the files to your game target:
@@ -180,19 +186,14 @@ let walkableTiles = tilemap.getTilesWithProperty("walkable", "1")
 ####Features
 
 - renders all Tiled layer types (tile, object, image)
-- custom properties for maps, layers, objects & tiles
-- parses inline & external tilesets
-- render tile layers as a single sprite
-- render animated tiles
-- render flipped tiles
+- flexible custom properties for all objects
+- parses inline, collection & external tilesets
+- renders flipped & animated tiles
 
 
 ####Limitations
 
-- only orthogonal & isometric tilemaps supported.
 - cannot parse data compressed with gzip/zlib compression.
-- external tilesets can increase the overall load time.
-- animated tiles are restricted to a per-tile frame duration (Tiled application supports per-frame durations).
 
 
 ####Upcoming Features
@@ -201,7 +202,7 @@ let walkableTiles = tilemap.getTilesWithProperty("walkable", "1")
 - Wiki page with tutorials
 - positioning hints for tile placement
 - multi-threaded rendering
-- generate GKGridGraph graphs based on custom tile attributes
+- generate GKGridGraph graphs based on custom tile attributes (iOS10)
 - user-definable cost properties for GKGridGraph nodes (iOS10)
 
 
