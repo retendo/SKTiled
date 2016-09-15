@@ -136,6 +136,8 @@ public class SKTileset: SKTiledObject {
      - parameter source: `String` image named referenced in the tileset.
      */
     public func addTextures(fromSpriteSheet source: String) {
+        // images are stored in separate directories in the project will render incorrectly unless we use just the filename
+        let sourceFilename = source.componentsSeparatedByString("/").last!
         let timer = NSDate()
         self.source = source
         print("[SKTileset]: adding sprite sheet source: \"\(self.source)\"")
@@ -265,6 +267,17 @@ public class SKTileset: SKTiledObject {
     }
     
     /**
+     Returns tile data with the given property.
+     
+     - parameter withProperty: `String` property name.
+     
+     - returns: `[SKTilesetData]` array of tile data.
+     */
+    public func getTileData(withProperty property: String) -> [SKTilesetData] {
+        return tileData.filter { $0.properties[property] != nil }
+    }
+    
+    /**
      Convert a global ID to the tileset's local ID (or -1 if invalid).
      
      - parameter id: `Int` global id.
@@ -308,5 +321,3 @@ extension SKTileset: CustomStringConvertible, CustomDebugStringConvertible {
         return description
     }
 }
-
-

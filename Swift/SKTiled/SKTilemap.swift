@@ -505,13 +505,14 @@ public class SKTilemap: SKNode, SKTiledObject{
      */
     public func isolateLayer(named: String?) {
         guard let name = named else {
-            layers.map({$0.visible = true})
+            layers.forEach { $0.visible = true }
             return
         }
-        layers.map({
-            var isHidden: Bool = $0.name == named ? true : false
+        
+        layers.forEach {
+            let isHidden: Bool = $0.name == named ? true : false
             $0.visible = isHidden
-        })
+        }
     }
     
     /**
@@ -726,6 +727,16 @@ public class SKTilemap: SKNode, SKTiledObject{
     }
     
     /**
+     Return tile data with a property of the given type (all tile layers).
+     
+     - parameter named: `String` property name.
+     - returns: `[SKTile]` array of tiles.
+     */
+    public func getTileDataWithProperty(named: String) -> [SKTilesetData] {
+        return tileSets.flatMap { $0.getTileData(withProperty: named) }
+    }
+    
+    /**
      Returns an array of all animated tile objects.
      
      - returns: `[SKTile]` array of tiles.
@@ -741,6 +752,24 @@ public class SKTilemap: SKNode, SKTiledObject{
             }
         }
         return result
+    }
+    
+    /**
+     Return the top-most tile at the given coordinate.
+     
+     - parameter coord: `TileCoord` coordinate.
+    
+     - returns: `SKTile?` first tile in layers.
+     */
+    public func firstTileAt(coord: TileCoord) -> SKTile? {
+        for layer in tileLayers.reverse() {
+            if layer.visible == true{
+                if let tile = layer.tileAt(coord) {
+                    return tile
+                }
+            }
+        }
+        return nil
     }
     
     // MARK: - Objects
@@ -823,6 +852,33 @@ public class SKTilemap: SKNode, SKTiledObject{
             }
         }
         return nil
+    }
+    
+    // MARK: - Coordinates
+    
+    
+    /**
+     Returns a converted touch location.
+     
+     - parameter point: `CGPoint` scene point.
+     
+     - returns: `CGPoint` converted point in layer coordinate system.
+     */
+    #if os(iOS)
+    public func touchLocation(touch: UITouch) -> CGPoint {
+        return baseLayer.touchLocation(touch)
+    }
+    #endif
+    
+    #if os(OSX)
+    public func mouseLocation(event: NSEvent) -> CGPoint {
+        return baseLayer.mouseLocation(event)
+    }
+    #endif
+    
+    
+    public func positionInMap(point: CGPoint) -> CGPoint {
+        return convertPoint(point, toNode: baseLayer).invertedY
     }
 }
 

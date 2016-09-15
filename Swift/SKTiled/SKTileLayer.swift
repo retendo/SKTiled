@@ -9,7 +9,10 @@
 import SpriteKit
 #if os(iOS)
 import UIKit
+#else
+import Cocoa
 #endif
+
 
 
 public enum SKTiledLayerType: Int {
@@ -72,6 +75,8 @@ public class TiledLayerObject: SKNode, SKTiledObject {
     private var grid: SKSpriteNode
     public var gridOpacity: CGFloat = 0.1
     
+    public var rendered: Bool = false
+    
     public var origin: CGPoint {
         switch orientation {
         case .Orthogonal:
@@ -88,6 +93,7 @@ public class TiledLayerObject: SKNode, SKTiledObject {
         return CGRectMake(-sizeInPoints.halfWidth, -sizeInPoints.halfHeight, sizeInPoints.width, sizeInPoints.height)
     }
     
+    /// Returns the frame rectangle of the layer (used to draw bounds).
     override public var frame: CGRect {
         return CGRectMake(0, 0, sizeInPoints.width, -sizeInPoints.height)
     }
@@ -288,6 +294,12 @@ public class TiledLayerObject: SKNode, SKTiledObject {
     #if os(iOS)
     public func touchLocation(touch: UITouch) -> CGPoint {
         return convertPoint(touch.locationInNode(self))
+    }
+    #endif
+    
+    #if os(OSX)
+    public func mouseLocation(event: NSEvent) -> CGPoint {
+        return convertPoint(event.locationInNode(self))
     }
     #endif
     

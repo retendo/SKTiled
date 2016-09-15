@@ -20,22 +20,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         
+        // load demo files from a propertly list
+        demoFiles = loadDemoFiles("DemoFiles")
         
-        
+        let currentFilename = demoFiles.first!
         
         /* Pick a size for the scene */
-        let scene = SKTiledDemoScene(fileNamed:"GameScene") 
+        let scene = SKTiledDemoScene(size: self.skView!.bounds.size, tmxFile: currentFilename)
+        
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .AspectFill
         
         self.skView!.presentScene(scene)
-        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(loadNextScene), name: "loadNextScene", object: nil)
         /* Sprite Kit applies additional optimizations to improve rendering performance */
         self.skView!.ignoresSiblingOrder = true
         
         self.skView!.showsFPS = true
         self.skView!.showsNodeCount = true
         
+        if let window = window {
+            window.title = "SKTiled: \(currentFilename)"
+        }
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication) -> Bool {
@@ -48,7 +54,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
      - parameter interval: `NSTimeInterval` transition duration.
      */
     func loadNextScene(interval: NSTimeInterval=0.4) {
-        guard let view = self.view as? SKView else { return }
+        guard let view = self.skView else { return }
+        
+        var demoFiles: [String] = loadDemoFiles("DemoFiles")
         
         var currentFilename = demoFiles.first!
         if let currentScene = view.scene as? SKTiledDemoScene {
@@ -70,6 +78,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let transition = SKTransition.fadeWithDuration(interval)
         view.presentScene(nextScene, transition: transition)
         
+        if let window = window {
+            window.title = "SKTiled: \(nextFilename)"
+        }
     }
     
     private func loadDemoFiles(filename: String) -> [String] {

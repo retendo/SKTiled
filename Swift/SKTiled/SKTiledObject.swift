@@ -18,11 +18,11 @@ public protocol SKTiledObject: Hashable {
 }
 
 
-
 public extension SKTiledObject {
     
     public var hashValue: Int { return uuid.hashValue }
     
+    // MARK: - Properties Parsing
     /**
      Returns true if the node has the given property.
      
@@ -74,6 +74,21 @@ public extension SKTiledObject {
     }
     
     /**
+     Returns a integer array for the given key.
+     
+     - parameter key:         `String` properties key.
+     - parameter separatedBy: `String` separator.
+     
+     - returns: `[Int]` array of integers for properties key.
+     */
+    public func integerArrayForKey(key: String, separatedBy: String=",") -> [Int] {
+        if let value = properties[key] {
+            return  value.componentsSeparatedByString(separatedBy).flatMap { Int($0) }
+        }
+        return [Int]()
+    }
+    
+    /**
      Returns a float value for the given key.
      
      - parameter key: `String` properties key.
@@ -83,6 +98,21 @@ public extension SKTiledObject {
     public func doubleForKey(key: String) -> Double? {
         guard (hasKey(key) == true) else { return nil }
         return Double(properties[key]!)
+    }
+    
+    /**
+     Returns a double array for the given key.
+     
+     - parameter key:         `String` properties key.
+     - parameter separatedBy: `String` separator.
+     
+     - returns: `[Double]` array of doubles for properties key.
+     */
+    public func doubleArrayForKey(key: String, separatedBy: String=",") -> [Double] {
+        if let value = properties[key] {
+            return  value.componentsSeparatedByString(separatedBy).flatMap { Double($0) }
+        }
+        return [Double]()
     }
     
     /**
@@ -106,4 +136,22 @@ public extension SKTiledObject {
         }
         return pstring
     }
+    
+    // MARK: - Key/Value Parsing
+    /**
+     Parses a key/value string (separated byt '=') and returns a tuple.
+     
+     - parameter string: `String` key/value string.
+     
+     - returns: `(String:Any)?` value for properties key.
+     */
+    public func keyValuePair(string: String) -> (key: String, value: Any)? {
+        var result: (key: String, value: Any)? = nil
+        let values = string.componentsSeparatedByString("=")
+        if values.count == 2 {
+            result = (key: values[0], value: values[1])
+    }
+        return result
+    }
 }
+

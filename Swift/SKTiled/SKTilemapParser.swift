@@ -6,6 +6,7 @@
 //  Copyright © 2016 Michael Fessenden. All rights reserved.
 //  Derived from: https://medium.com/@lucascerro/understanding-nsxmlparser-in-swift-xcode-6-3-1-7c96ff6c65bc#.1m4mh6nhy
 
+
 import SpriteKit
 
 
@@ -96,6 +97,7 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
         renderTileLayers()
         renderObjects()
         
+        // set baseLayer zPosition here
         tileMap.baseLayer.zPosition = tileMap.lastZPosition + tileMap.zDeltaForLayers
         
         // time results
@@ -120,7 +122,7 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
         for fileExtension in ["tmx", "tsx"] {
             if let url = NSBundle.mainBundle().URLForResource(fileBaseName, withExtension: fileExtension) {
                 let filepath = url.absoluteString
-                if let filename = filepath.componentsSeparatedByString("/").last {
+                if let filename = filepath!.componentsSeparatedByString("/").last {
                     return filename
                 }
             }
@@ -236,8 +238,6 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
                     existingTileset.tileSize = CGSize(width: CGFloat(Int(width)!), height: CGFloat(Int(width)!))
                     existingTileset.columns = Int(columns)!
                     
-                    //print("[SKTilemapParser]: updating existing tileset: \"\(existingTileset.name)\" @ \"\(existingTileset.filename)\"")
-                    
                     // optionals
                     if let spacing = attributeDict["spacing"] {
                         existingTileset.spacing = Int(spacing)!
@@ -248,8 +248,6 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
                     }
                     
                     lastElement = existingTileset
-                    //TODO: remove tileset from external tilesets?
-                    
                     
                 } else {
                     // create inline tileset
@@ -258,7 +256,6 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
                     lastElement = tileset
 
                     // set this to nil, just in case we're looking for a collections tileset.
-                    // TODO: check that this isn't causing issues
                     currentID = nil
                 }
             }

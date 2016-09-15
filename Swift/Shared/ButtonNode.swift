@@ -8,6 +8,11 @@
 
 import Foundation
 import SpriteKit
+#if os(iOS)
+import UIKit
+#else
+import Cocoa
+#endif
 
 
 protocol ButtonNodeResponderType: class {
@@ -76,6 +81,15 @@ public class ButtonNode: SKSpriteNode {
         }
     }
     
+    /**
+     Runs the trigger action.
+     */
+    public func buttonTriggered() {
+        if userInteractionEnabled {
+            buttonAction()
+        }
+    }
+    
     // swap textures when button is pressed
     public var wasPressed = false {
         didSet {
@@ -87,6 +101,20 @@ public class ButtonNode: SKSpriteNode {
         }
     }
     
+    /**
+     Returns a representation for use in playgrounds.
+     
+     - returns: `AnyObject?` visual representation.
+     */
+    public func debugQuickLookObject() -> AnyObject? {
+        return defaultTexture
+    }
+}
+
+
+
+#if os(iOS)
+public extension ButtonNode {
     // MARK: - Touch Handling
     override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         super.touchesBegan(touches, withEvent: event)
@@ -104,19 +132,11 @@ public class ButtonNode: SKSpriteNode {
         }
     }
     
-    override public func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+    override public func touchesCancelled(touches: Set<UITouch>, withEvent event: UIEvent?) {
         super.touchesCancelled(touches, withEvent: event)
         wasPressed = false
     }
-    
-    /**
-     Runs the trigger action.
-     */
-    public func buttonTriggered() {
-        if userInteractionEnabled {
-            buttonAction()
-        }
-    }
+
     
     /**
      Returns true if any of the touches are within the `ButtonNode` body.
@@ -133,13 +153,37 @@ public class ButtonNode: SKSpriteNode {
             return touchedNode === self || touchedNode.inParentHierarchy(self)
         }
     }
+}
+#endif
+
+
+#if os(OSX)
+public extension ButtonNode {
+    
+    override public func mouseDown(event: NSEvent) {
+        if userInteractionEnabled {
+            wasPressed = true
+        }
+    }
+    
+    override public func mouseUp(event: NSEvent) {
+        wasPressed = false
+        if containsEvent(event) {
+            buttonTriggered()
+        }
+    }
     
     /**
-     Returns a representation for use in playgrounds.
+     Returns true if any of the touches are within the `ButtonNode` body.
      
-     - returns: `AnyObject?` visual representation.
+     - parameter touches: `Set<UITouch>`
+     
+     - returns: `Bool` button was touched.
      */
-    public func debugQuickLookObject() -> AnyObject? {
-        return defaultTexture
+    private func containsEvent(event: NSEvent) -> Bool {
+        guard let scene = scene else { fatalError("Button must be used within a scene.") }
+        let touchedNode = scene.nodeAtPoint(event.locationInNode(scene))
+        return touchedNode === self || touchedNode.inParentHierarchy(self)
     }
 }
+#endif

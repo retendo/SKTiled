@@ -25,27 +25,28 @@ import Cocoa
  
  - returns: `UIImage` result.
  */
-public func imageOfSize(size: CGSize, scale: CGFloat=1, _ whatToDraw: (context: CGContext, bounds: CGRect, scale: CGFloat) -> ()) -> CGImage {
+public func imageOfSize(size: CGSize, scale: CGFloat=1, _ whatToDraw: (_: CGContext, _: CGRect, _: CGFloat) -> ()) -> CGImage {
     // create an image of size, not opaque, not scaled
     UIGraphicsBeginImageContextWithOptions(size, false, scale)
     let context = UIGraphicsGetCurrentContext()
     let bounds = CGRect(origin: CGPointZero, size: size)
-    whatToDraw(context: context!, bounds: bounds, scale: scale)
+    whatToDraw(context!, bounds, scale)
     let result = UIGraphicsGetImageFromCurrentImageContext()
-    return result.CGImage!
+    return result!.CGImage!
 }
 #else
-public func imageOfSize(size: CGSize, scale: CGFloat, _ whatToDraw: (context: CGContext, bounds: CGRect, scale: CGFloat) -> ()) -> CGImageRef {
-    let image = NSImage(size: size)
+public func imageOfSize(size: CGSize, scale: CGFloat, _ whatToDraw: (_: CGContext, _: CGRect, _: CGFloat) -> ()) -> CGImage {
+    let scaledSize = size * scale
+    let image = NSImage(size: scaledSize)
     image.lockFocus()
     let nsContext = NSGraphicsContext.currentContext()!
     let context = nsContext.CGContext
     let bounds = CGRect(origin: CGPointZero, size: size)
-    whatToDraw(context: context, bounds: bounds, scale: scale)
+    whatToDraw(context, bounds, scale)
     image.unlockFocus()
-        var imageRect = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
-        let imageRef = image.cgImage(forProposedRect: &imageRect, context: nil, hints: nil)
-        return imageRef!
+    var imageRect = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+    let imageRef = image.CGImageForProposedRect(&imageRect, context: nil, hints: nil)
+    return imageRef!
 }
 #endif
 
@@ -241,6 +242,7 @@ public extension SKScene {
 }
 
 
+
 public extension SKNode {
     
     /// visualize a node's anchor point.
@@ -300,7 +302,7 @@ public extension SKNode {
     }
 }
 
-
+#if os(iOS)
 public extension SKColor {
 
     /**
@@ -338,7 +340,7 @@ public extension SKColor {
         }
     }
 }
-
+#endif
 
 public extension String {
     
@@ -584,7 +586,7 @@ public func + (lhs: CGVector, rhs: CGVector) -> CGVector {
     return CGVector(dx: lhs.dx + rhs.dx, dy: lhs.dy + rhs.dy)
 }
 
-
+/*
 public func += (inout lhs: CGVector, rhs: CGVector) {
     lhs = lhs + rhs
 }
@@ -643,13 +645,19 @@ public func /= (inout lhs: CGVector, rhs: CGFloat) {
 public func lerp(start start: CGVector, end: CGVector, t: CGFloat) -> CGVector {
     return start + (end - start) * t
 }
-
+*/
 
 // MARK: - Helper Functions
 
 public func floor(point: CGPoint) -> CGPoint {
     return CGPoint(x: floor(Double(point.x)), y: floor(Double(point.y)))
 }
+
+
+public func normalize(_ value: CGFloat, _ minimum: CGFloat, _ maximum: CGFloat) -> CGFloat {
+    return (value - minimum) / (maximum - minimum)
+}
+
 
 /**
  Generate a visual grid texture.
@@ -669,8 +677,8 @@ public func drawGrid(layer: TiledLayerObject,  scale: CGFloat = 1) -> CGImage {
     let tileHeightHalf = tileHeight / 2
     
     var sizeInPoints = layer.sizeInPoints
-    //sizeInPoints = (sizeInPoints + 1) * scale   // this is giving us 4x scale @ 2x
     sizeInPoints = sizeInPoints + 1
+    
     return imageOfSize(sizeInPoints, scale: scale) { context, bounds, scale in
         
         let innerColor = layer.gridColor
@@ -719,6 +727,7 @@ public func drawGrid(layer: TiledLayerObject,  scale: CGFloat = 1) -> CGImage {
                         
                         xpos += tileWidthHalf
                         ypos += tileHeightHalf
+                        
                         var hexPoints = Array(count: 6, repeatedValue: CGPointZero)
                         var variableSize: CGFloat = 0
                         var r: CGFloat = 0
@@ -770,12 +779,12 @@ public func drawGrid(layer: TiledLayerObject,  scale: CGFloat = 1) -> CGImage {
                         CGContextAddPath(context, shapePath)
                     }
                 }
+                
                 CGContextStrokePath(context)
             }
         }
     }
 }
-
 
 
 // MARK: - Polygon Drawing
@@ -838,8 +847,8 @@ public func polygonPointArray(sides: Int, radius: CGSize, offset: CGFloat=0, ori
     }
     return points
 }
-
 /**
+
  Takes an array of points and returns a path.
  
  - parameter points:  `[CGPoint]` polygon points.

@@ -14,6 +14,7 @@ public class SKTile: SKSpriteNode {
     
     weak public var layer: SKTileLayer!                         // layer parent, assigned on add
     private var tileOverlap: CGFloat = 1.5                      // tile overlap amount
+    private var maxOverlap: CGFloat = 3.0               // maximum tile overlap
     public var tileData: SKTilesetData                          // tile data
     public var tileSize: CGSize                                 // tile size
     public var highlightColor: SKColor = SKColor.whiteColor()   // tile highlight color
@@ -114,16 +115,16 @@ public class SKTile: SKSpriteNode {
         var overlapValue = overlap <= 1.5 ? overlap : 1.5
         overlapValue = overlapValue > 0 ? overlapValue : 0
         guard overlapValue != tileOverlap else { return }
+        guard let tileTexture = tileData.texture else { return }
         
-        var width: CGFloat = tileData.texture.size().width
+        let width: CGFloat = tileData.texture.size().width
         let overlapWidth = width + (overlap / width)
 
-        var height: CGFloat = tileData.texture.size().height
+        let height: CGFloat = tileData.texture.size().height
         let overlapHeight = height + (overlap / height)
         
         xScale *= overlapWidth / width
         yScale *= overlapHeight / height
-        
         tileOverlap = overlap
     }
 
@@ -163,10 +164,142 @@ public class SKTile: SKSpriteNode {
             }
         }
     }
+
+    /**
+     Returns the points of the tile's shape.
+     
+     - returns: `[CGPoint]?` array of points.
+     */
+    private func getVertices() -> [CGPoint] {
+        var vertices: [CGPoint] = []
+        guard let layer = layer else { return vertices }
+        
+        let tileSizeHalved = CGSize(width: layer.tileSize.halfWidth, height: layer.tileSize.halfHeight)
+        
+        switch layer.orientation {
+        case .Orthogonal:
+            let origin = CGPoint(x: -tileSizeHalved.width, y: tileSizeHalved.height)
+            vertices = rectPointArray(tileSize, origin: origin)
+            
+        case .Isometric, .Staggered:
+            vertices = [
+                CGPoint(x: -tileSizeHalved.width, y: 0),    // left-side
+                CGPoint(x: 0, y: tileSizeHalved.height),
+                CGPoint(x: tileSizeHalved.width, y: 0),
+                CGPoint(x: 0, y: -tileSizeHalved.height),   // bottom
+            ]
+            
+        case .Hexagonal:
+            var hexPoints = Array(count: 6, repeatedValue: CGPointZero)
+            let staggerX = layer.tilemap.staggerX
+            let tileWidth = layer.tilemap.tileWidth
+            let tileHeight = layer.tilemap.tileHeight
+            
+            let sideLengthX = layer.tilemap.sideLengthX
+            let sideLengthY = layer.tilemap.sideLengthY
+            var variableSize: CGFloat = 0
+            
+            // flat
+            if (staggerX == true) {
+                let r = (tileWidth - sideLengthX) / 2
+                let h = tileHeight / 2
+                variableSize = tileWidth - (r * 2)
+                hexPoints[0] = CGPoint(x: -(variableSize / 2), y: h)
+                hexPoints[1] = CGPoint(x: (variableSize / 2), y: h)
+                hexPoints[2] = CGPoint(x: (tileWidth / 2), y: 0)
+                hexPoints[3] = CGPoint(x: (variableSize / 2), y: -h)
+                hexPoints[4] = CGPoint(x: -(variableSize / 2), y: -h)
+                hexPoints[5] = CGPoint(x: -(tileWidth / 2), y: 0)
+                
+            // pointy
+            } else {
+                let r = tileWidth / 2
+                let h = (tileHeight - sideLengthY) / 2
+                variableSize = tileHeight - (h * 2)
+                hexPoints[0] = CGPoint(x: 0, y: (tileHeight / 2))
+                hexPoints[1] = CGPoint(x: r, y: (variableSize / 2))
+                hexPoints[2] = CGPoint(x: r, y: -(variableSize / 2))
+                hexPoints[3] = CGPoint(x: 0, y: -(tileHeight / 2))
+                hexPoints[4] = CGPoint(x: -r, y: -(variableSize / 2))
+                hexPoints[5] = CGPoint(x: -r, y: (variableSize / 2))
+            }
+            
+            vertices = hexPoints.map{$0.invertedY}
+        }
+        
+        return vertices
+    }
+
+    /**
+     Draw the tile's boundary shape.
+
+     - parameter color: `SKColor` highlight color.
+     */
+    public func drawBounds(antialiasing: Bool=true, duration: NSTimeInterval=0) {
+        guard let layer = layer else { return }
+        childNodeWithName("Anchor")?.removeFromParent()
+        childNodeWithName("Bounds")?.removeFromParent()
+        
+        let vertices = getVertices()
+        let path = polygonPath(vertices)
+        let shape = SKShapeNode(path: path)
+        shape.name = "Bounds"
+        let shapeZPos = zPosition + 10
+        
+        // draw the path
+        shape.antialiased = false
+        shape.lineCap = .Butt
+        shape.miterLimit = 0
+        shape.lineWidth = 0.5
+        
+        shape.strokeColor = highlightColor.colorWithAlphaComponent(0.4)
+        shape.fillColor = highlightColor.colorWithAlphaComponent(0.35)
+        shape.zPosition = shapeZPos
+        addChild(shape)
+        
+        // anchor
+        let anchorRadius: CGFloat = tileSize.height / 12 > 1.0 ? tileSize.height / 30 : 1.0
+        let anchor = SKShapeNode(circleOfRadius: anchorRadius)
+        anchor.name = "Anchor"
+        shape.addChild(anchor)
+        anchor.fillColor = highlightColor.colorWithAlphaComponent(0.2)
+        anchor.strokeColor = SKColor.clearColor()
+        anchor.zPosition = shapeZPos + 10
+        anchor.antialiased = true
+        
+        if (duration > 0) {
+            let fadeAction = SKAction.fadeOutWithDuration(duration)
+            shape.runAction(fadeAction, completion: {
+                shape.removeFromParent()
+                
+            })
+        }
+    }
 }
+    
 
 
-extension SKTile {
+public extension SKTile {
+    
+    /// Tile description.
+    override public var description: String {
+        let descString = "\(tileData.description)"
+        let descGroup = descString.componentsSeparatedByString(".")
+        var resultString = descGroup.first!
+        if let layer = layer {resultString += ", Layer: \"\(layer.name!)\"" }
+        
+        // add the properties
+        if descGroup.count > 1 {
+            for i in 1..<descGroup.count {
+                resultString += ", \(descGroup[i])"
+            }
+        }
+        return resultString
+    }
+    
+    override public var debugDescription: String {
+        return description
+    }
     
     /**
      Highlight the tile with a given color.
@@ -229,6 +362,7 @@ extension SKTile {
             removeActionForKey("HIGHLIGHT")
         }
     }
+
     
     /**
      Playground debugging visualization.
@@ -275,29 +409,43 @@ public class DebugTileShape: SKShapeNode {
             let origin = CGPoint(x: -tileSize.halfWidth, y: tileSize.halfHeight)
             points = rectPointArray(tileSize, origin: origin)
             
-        case .Isometric:
+        case .Isometric, .Staggered:
             points = polygonPointArray(4, radius: tileSizeHalved)
             
         case .Hexagonal:
-            var hexPoints = Array(count: 8, repeatedValue: CGPointZero)
+            var hexPoints = Array(count: 6, repeatedValue: CGPointZero)
+            let staggerX = layer.tilemap.staggerX
             let tileWidth = layer.tilemap.tileWidth
-            let sideOffsetX = layer.tilemap.sideOffsetX
             let tileHeight = layer.tilemap.tileHeight
-            let sideOffsetY = layer.tilemap.sideOffsetY
             
-            hexPoints[0] = CGPoint(x: 0, y: tileHeight - sideOffsetY)
-            hexPoints[1] = CGPoint(x: 0, y: sideOffsetY)
-            hexPoints[2] = CGPoint(x: sideOffsetX, y: 0)
-            hexPoints[3] = CGPoint(x: tileWidth - sideOffsetX, y: 0)
-            hexPoints[4] = CGPoint(x: tileWidth, y: sideOffsetY)
-            hexPoints[5] = CGPoint(x: tileWidth, y: tileHeight - sideOffsetY)
-            hexPoints[6] = CGPoint(x: tileWidth - sideOffsetX, y: tileHeight)
-            hexPoints[7] = CGPoint(x: sideOffsetX, y: tileHeight)
+            let sideLengthX = layer.tilemap.sideLengthX
+            let sideLengthY = layer.tilemap.sideLengthY
+            var variableSize: CGFloat = 0
+            
+            // flat (broken)
+            if (staggerX == true) {
+                let r = (tileWidth - sideLengthX) / 2
+                let h = tileHeight / 2
+                variableSize = tileWidth - (r * 2)
+                hexPoints[0] = CGPoint(x: position.x - (variableSize / 2), y: position.y + h)
+                hexPoints[1] = CGPoint(x: position.x + (variableSize / 2), y: position.y + h)
+                hexPoints[2] = CGPoint(x: position.x + (tileWidth / 2), y: position.y)
+                hexPoints[3] = CGPoint(x: position.x + (variableSize / 2), y: position.y - h)
+                hexPoints[4] = CGPoint(x: position.x - (variableSize / 2), y: position.y - h)
+                hexPoints[5] = CGPoint(x: position.x - (tileWidth / 2), y: position.y)
+            } else {
+                let r = tileWidth / 2
+                let h = (tileHeight - sideLengthY) / 2
+                variableSize = tileHeight - (h * 2)
+                hexPoints[0] = CGPoint(x: position.x, y: position.y + (tileHeight / 2))
+                hexPoints[1] = CGPoint(x: position.x + (tileWidth / 2), y: position.y + (variableSize / 2))
+                hexPoints[2] = CGPoint(x: position.x + (tileWidth / 2), y: position.y - (variableSize / 2))
+                hexPoints[3] = CGPoint(x: position.x, y: position.y - (tileHeight / 2))
+                hexPoints[4] = CGPoint(x: position.x - (tileWidth / 2), y: position.y - (variableSize / 2))
+                hexPoints[5] = CGPoint(x: position.x - (tileWidth / 2), y: position.y + (variableSize / 2))
+            }
             
             points = hexPoints.map{$0.invertedY}
-            
-        case .Staggered:
-            points = polygonPointArray(4, radius: tileSizeHalved)
         }
         
         // draw the path

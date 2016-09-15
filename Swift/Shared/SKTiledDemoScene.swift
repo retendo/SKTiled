@@ -12,6 +12,7 @@ import SpriteKit
 
 public class SKTiledDemoScene: SKTiledScene {
     
+    public var uiScale: CGFloat = 1
     public var debugMode: Bool = false
     
     // ui controls
@@ -28,24 +29,17 @@ public class SKTiledDemoScene: SKTiledScene {
     
     
     /// global information label font size.
-    public var labelFontSize: CGFloat = 12 {
-        didSet {
-            guard oldValue != labelFontSize else { return }
-            
-            if let cameraInformation = cameraInformation {
-                cameraInformation.fontSize = labelFontSize
-            }
-            if let tilemapInformation = tilemapInformation {
-                tilemapInformation.fontSize = labelFontSize
-            }
-            if let tileInformation = tileInformation {
-                tileInformation.fontSize = labelFontSize
-            }
-        }
-    }
+    public var labelFontSize: CGFloat = 12
     
     override public func didMoveToView(view: SKView) {
         super.didMoveToView(view)
+        
+        #if os(OSX)
+        // add mouse tracking for OSX
+        let options = [NSTrackingAreaOptions.MouseMoved, NSTrackingAreaOptions.ActiveAlways] as NSTrackingAreaOptions
+        let trackingArea = NSTrackingArea(rect: view.frame, options: options, owner: self, userInfo: nil)
+        view.addTrackingArea(trackingArea)
+        #endif
         
         // setup demo UI
         setupDemoUI()
@@ -148,33 +142,7 @@ public class SKTiledDemoScene: SKTiledScene {
         tileInformation.hidden = true
         cameraInformation.hidden = true
     }
-    
-    override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        guard let tilemap = tilemap else { return }
-        
-        cameraInformation.hidden = false
-        
-        for touch in touches {
-            
-            let positionInLayer = tilemap.baseLayer.convertPoint(touch.locationInNode(tilemap.baseLayer))
-            let positionInMap = tilemap.baseLayer.screenToPixelCoords(positionInLayer)
-            let coord = tilemap.baseLayer.screenToTileCoords(positionInLayer)
-            
-            // add a tile shape to the base layer where the user has clicked
-            let validCoord = tilemap.baseLayer.isValid(coord)
-            let tileColor: SKColor = (validCoord == true) ? TiledColors.Green.color : TiledColors.Red.color
-            addTileAt(tilemap.baseLayer, Int(coord.x), Int(coord.y), duration: 5, tileColor: tileColor)
-            
-            // display tile information on the screen
-            var coordStr = "Tile: \(coord.description), \(positionInMap.roundTo())"
-            if (validCoord == false) {
-                coordStr += " (invalid)"
-            }
-            
-            tileInformation.hidden = false
-            tileInformation.text = coordStr
-        }
-    }
+
     
     /**
      Add a tile shape to a layer at the given coordinate.
@@ -244,4 +212,117 @@ public class SKTiledDemoScene: SKTiledScene {
     }
 }
 
+
+#if os(iOS)
+public extension SKTiledDemoScene {
+    
+    override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        guard let tilemap = tilemap else { return }
+        
+        cameraInformation.hidden = false
+        
+        for touch in touches {
+            
+            let positionInLayer = tilemap.baseLayer.convertPoint(touch.locationInNode(tilemap.baseLayer))
+            let positionInMap = tilemap.baseLayer.screenToPixelCoords(positionInLayer)
+            let coord = tilemap.baseLayer.screenToTileCoords(positionInLayer)
+            
+            // add a tile shape to the base layer where the user has clicked
+            let validCoord = tilemap.baseLayer.isValid(coord)
+            let tileColor: SKColor = (validCoord == true) ? TiledColors.Green.color : TiledColors.Red.color
+            addTileAt(tilemap.baseLayer, Int(coord.x), Int(coord.y), duration: 5, tileColor: tileColor)
+            
+            // display tile information on the screen
+            var coordStr = "Tile: \(coord.description), \(positionInMap.roundTo())"
+            if (validCoord == false) {
+                coordStr += " (invalid)"
+            }
+            
+            tileInformation.hidden = false
+            tileInformation.text = coordStr
+        }
+    }
+}
+#endif
+
+#if os(OSX)
+public extension SKTiledDemoScene {
+    
+    
+    override public func mouseDown(event: NSEvent) {
+        guard let tilemap = tilemap else { return }
+        guard let cameraNode = cameraNode else { return }
+        cameraNode.mouseDown(event)
+        
+        let baseLayer = tilemap.baseLayer
+        
+        // get the position in the baseLayer
+        let positionInLayer = baseLayer.mouseLocation(event)
+        let positionInMap = baseLayer.screenToPixelCoords(positionInLayer)
+        let coord = baseLayer.screenToTileCoords(positionInLayer)
+        
+        // add a tile shape to the base layer where the user has clicked
+        let validCoord = tilemap.baseLayer.isValid(coord)
+        let tileColor: SKColor = (validCoord == true) ? TiledColors.Green.color : TiledColors.Red.color
+        
+        // add a tile shape to the base layer where the user has clicked
+        addTileAt(baseLayer, Int(coord.x), Int(coord.y), duration: 5, tileColor: tileColor)
+        
+        // update the tile information label
+        let coordStr = "Tile: \(coord.description), \(positionInMap.roundTo())"
+        tileInformation.hidden = false
+        tileInformation.text = coordStr
+    }
+    
+    override public func mouseMoved(event: NSEvent) {
+        super.mouseMoved(event)
+        guard let tilemap = tilemap else { return }
+        let baseLayer = tilemap.baseLayer
+        
+        // get the position in the baseLayer (inverted)
+        let positionInLayer = baseLayer.mouseLocation(event)
+        let positionInMap = baseLayer.screenToPixelCoords(positionInLayer)
+        let coord = baseLayer.screenToTileCoords(positionInLayer)
+        
+        tileInformation?.hidden = false
+        tileInformation?.text = "Tile: ---, \(positionInMap.roundTo())"
+        
+        if let firstTile = tilemap.firstTileAt(coord) {
+            firstTile.drawBounds(true, duration: 0.5)
+            
+            // update the tile information label
+            let coordStr = "\(firstTile.description), \(positionInMap.roundTo())"
+            tileInformation?.hidden = false
+            tileInformation?.text = coordStr
+        }
+    }
+    
+    override public func mouseDragged(event: NSEvent) {
+        guard let cameraNode = cameraNode else { return }
+        cameraNode.scenePositionChanged(event)
+    }
+    
+    override public func mouseUp(event: NSEvent) {
+        guard let cameraNode = cameraNode else { return }
+        cameraNode.mouseUp( event)
+    }
+    
+    override public func scrollWheel(event: NSEvent) {
+        guard let cameraNode = cameraNode else { return }
+        cameraNode.scrollWheel( event)
+    }
+    
+    override public func keyDown(event: NSEvent) {
+        guard let cameraNode = cameraNode else { return }
+        if event.keyCode == 0x00 || event.keyCode == 0x52 || event.keyCode == 0x1D {
+            if let tilemap = tilemap {
+                cameraNode.resetCamera(toScale: tilemap.worldScale)
+            } else {
+                cameraNode.resetCamera()
+            }
+        }
+    }
+
+}
+#endif
 
