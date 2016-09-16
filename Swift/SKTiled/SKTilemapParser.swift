@@ -10,6 +10,7 @@
 import SpriteKit
 
 
+/// XML Parser error types.
 public enum ParsingError: ErrorType {
     case Attribute(attr: String)
     case AttributeValue(attr: String, value: String)
@@ -22,7 +23,17 @@ public enum ParsingError: ErrorType {
 
 // MARK: - TMX Parser
 
-/// Class for reading Tiled tmx files.
+/**
+ The `SKTilemapParser` is a custom `XMLParserDelegate` parser for reading Tiled .tmx and .tsx files.
+ 
+ To read a tile map, used the `SKTilemapParser.load` method:
+ 
+ ```swift
+ if let tilemap = SKTilemapParser().load(fromFile: "sample-file") {
+    scene.worldNode.addChild(tilemap)
+ }
+ ```
+ */
 public class SKTilemapParser: NSObject, NSXMLParserDelegate {
     
     public var fileNames: [String] = []                         // list of filenames to read
@@ -690,4 +701,3 @@ public extension String {
         return scrubbed.stringByReplacingOccurrencesOfString(" ", withString: "")
     }
 }
-

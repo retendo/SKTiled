@@ -10,29 +10,47 @@ import SpriteKit
 
 
 /**
- *  Delegate for managing `SKTilemap` nodes.
+ Delegate for managing `SKTilemap` nodes in an `SKScene`. This protocol and the `SKTiledScene` objects are included as a suggested way to use the `SKTilemap` class, but are not required.
+ 
+ In this configuration, the tile map is a child of the world node and reference the custom `SKTiledSceneCamera` camera.
+ 
+ - parameter worldNode:  `SKNode!` world container node.
+ - parameter cameraNode: `SKTiledSceneCamera!` scene camera node.
+ - parameter tilemap:    `SKTilemap!` tile map node.
  */
 protocol SKTiledSceneDelegate {
-    var worldNode: SKNode! { get set }                  // world node container
-    var cameraNode: SKTiledSceneCamera! { get set }     // scene camera
-    var tilemap: SKTilemap! { get set }                 // tile map
+    /// World container node
+    var worldNode: SKNode! { get set }
+    /// Custom scene camera.
+    var cameraNode: SKTiledSceneCamera! { get set }
+    /// Tile map node.
+    var tilemap: SKTilemap! { get set }
 }
 
 
+/**
+ Custom scene type for managing `SKTilemap` nodes.
+ 
+ - parameter worldNode:  `SKNode!` world container node.
+ - parameter cameraNode: `SKTiledSceneCamera!` scene camera node.
+ - parameter tilemap:    `SKTilemap!` tile map node.
+ */
 public class SKTiledScene: SKScene, SKTiledSceneDelegate {
     
-    // SKTiledSceneDelegate
-    public var worldNode: SKNode!                   // world container node
-    public var cameraNode: SKTiledSceneCamera!      // tiled scene camera
-    public var tilemap: SKTilemap!                  // tile map node
-    public var tmxFilename: String!                 // current tmx file name
+    /// World container node
+    public var worldNode: SKNode!
+    /// Custom scene camera.
+    public var cameraNode: SKTiledSceneCamera!
+    /// Tile map node.
+    public var tilemap: SKTilemap!
+    /// Current tmx file name.
+    public var tmxFilename: String!
     
     // MARK: - Init
     /**
      Initialize without a tiled map.
      
-     - parameter size: `CGSize` scene size.
-     
+     - parameter size: `CGSize` scene size.     
      - returns: `SKTiledScene` scene.
      */
     override public init(size: CGSize) {

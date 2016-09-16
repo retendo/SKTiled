@@ -134,7 +134,9 @@ public extension TiledLayerObject {
 
 
 public extension SKTileLayer {
-    
+    /**
+     Parse the tile layer's properties.
+    */
     override public func parseProperties() {
         super.parseProperties()
     }
@@ -142,7 +144,9 @@ public extension SKTileLayer {
 
 
 public extension SKObjectGroup {
-    
+    /**
+     Parse the object groups properties.
+    */
     override public func parseProperties() {
         super.parseProperties()
         for (attr, value) in properties {
@@ -155,6 +159,9 @@ public extension SKObjectGroup {
 
 
 public extension SKImageLayer {
+    /**
+     Parse the image layer's properties.
+    */
     override public func parseProperties() {
         super.parseProperties()
     }

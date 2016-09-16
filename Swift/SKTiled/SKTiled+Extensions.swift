@@ -18,7 +18,7 @@ import Cocoa
 #if os(iOS)
 /**
  Returns an image of the given size.
- 
+
  - parameter size:       `CGSize` size of resulting image.
  - parameter scale:      `CGFloat` scale of result (0 seems to scale 2x, using 1 seems best)
  - parameter whatToDraw: function detailing what to draw the image.
@@ -302,9 +302,15 @@ public extension SKNode {
     }
 }
 
-#if os(iOS)
 public extension SKColor {
-
+    
+    /// Returns the hue, saturation, brightess & alpha components of the color
+    public var hsba: (h: CGFloat, s: CGFloat, b: CGFloat, a: CGFloat) {
+        var hsba: (h: CGFloat, s: CGFloat, b: CGFloat, a: CGFloat) = (0, 0, 0, 0)
+        self.getHue(&(hsba.h), saturation: &(hsba.s), brightness: &(hsba.b), alpha: &(hsba.a))
+        return hsba
+    }
+    
     /**
      Lightens the color by the given percentage.
      
@@ -327,20 +333,18 @@ public extension SKColor {
         return colorWithBrightness(1.0 - percent)
     }
     
+    /**
+     Return a modified color using the brightness factor provided
+     
+     - parameter factor: brightness factor
+     - returns: `SKColor` modified color
+     */
     public func colorWithBrightness(factor: CGFloat) -> SKColor {
-        var hue: CGFloat = 0
-        var saturation: CGFloat = 0
-        var brightness: CGFloat = 0
-        var alpha: CGFloat = 0
-        
-        if getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) {
-            return SKColor(hue: hue, saturation: saturation, brightness: brightness * factor, alpha: alpha)
-        } else {
-            return self;
-        }
+        let components = self.hsba
+        return SKColor(hue: components.h, saturation: components.s, brightness: components.b * factor, alpha: components.a)
     }
 }
-#endif
+
 
 public extension String {
     

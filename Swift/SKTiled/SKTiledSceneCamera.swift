@@ -14,7 +14,9 @@ import Cocoa
 #endif
 
 
-/// Custom scene camera that responds to various gestures.
+/**
+  Custom scene camera that responds to finger/mouse gestures.
+ */
 public class SKTiledSceneCamera: SKCameraNode {
     
     public let world: SKNode
@@ -149,20 +151,6 @@ public class SKTiledSceneCamera: SKCameraNode {
 #if os(iOS)
 public extension SKTiledSceneCamera {
     // MARK: - Gesture Handlers
-    /**
-     Handler for double taps.
-     
-     - parameter recognizer: `UITapGestureRecognizer` tap gesture recognizer.
-     */
-    public func sceneDoubleTapped(_ recognizer: UITapGestureRecognizer) {
-        if (recognizer.state == UIGestureRecognizerState.ended) {
-            //focusLocation = recognizer.location(in: recognizer.view)
-            guard let scene = self.scene as? SKTiledScene else { return }
-            // get the current point
-            let sceneLocation = scene.convertPoint(fromView: recognizer.location(in: recognizer.view))
-            // notify delegates
-        }
-    }
     
     /**
      Update the scene camera when a pan gesture is recogized.
@@ -170,17 +158,15 @@ public extension SKTiledSceneCamera {
      - parameter recognizer: `UIPanGestureRecognizer` pan gesture recognizer.
      */
     public func scenePannedHandler(recognizer: UIPanGestureRecognizer) {
-        guard let scene = self.scene else { return }
         if recognizer.state == .Began {
             lastLocation = recognizer.locationInView(recognizer.view)
-            lastLocation = location
         }
         
         if recognizer.state == .Changed {
             if lastLocation == nil { return }
             let location = recognizer.locationInView(recognizer.view)
             let difference = CGPoint(x: location.x - lastLocation.x, y: location.y - lastLocation.y)
-            centerOn(CGPoint(x: Int(position.x - difference.x), y: Int(position.y - -difference.y)))
+            centerOn(scenePoint: CGPoint(x: Int(position.x - difference.x), y: Int(position.y - -difference.y)))
             lastLocation = location
         }
     }

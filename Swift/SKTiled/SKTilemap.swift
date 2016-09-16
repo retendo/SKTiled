@@ -69,11 +69,12 @@ public enum TilemapEncoding: String {
 }
 
 
-// MARK: - Sizing
 
 /// Represents a tile x/y coordinate.
 public struct TileCoord {
+    /// Tile x-coordinate
     public var x: Int32
+    /// Tile y-coordinate
     public var y: Int32
 }
 
@@ -134,37 +135,50 @@ public let TileSize16x16 = CGSize(width: 16, height: 16)
 public let TileSize32x32 = CGSize(width: 32, height: 32)
 
 
+// MARK: - Tilemap
 
-/// Represents a tiled map node.
+/**
+ The `SKTilemap` class represents a container node which holds layers, tiles (sprites), objects & images.
+ 
+ - size:         tile map size in tiles.
+ - tileSize:     tile map tile size in pixels.
+ - sizeInPoints: tile map size in points.
+ 
+ Tile data is added via `SKTileset` tile sets.
+ */
 public class SKTilemap: SKNode, SKTiledObject{
     
-    public var filename: String!                                    // tilemap filename
-    public var uuid: String = NSUUID().UUIDString                   // unique id
-    public var size: CGSize                                         // map size (in tiles)
-    public var tileSize: CGSize                                     // tile size (in pixels)
-    public var orientation: TilemapOrientation                      // map orientation
-    public var renderOrder: RenderOrder = .RightDown                // render order
+    public var filename: String!                                    /// tilemap filename
+    public var uuid: String = NSUUID().UUIDString                   /// unique id
+    public var size: CGSize                                         /// map size (in tiles)
+    public var tileSize: CGSize                                     /// tile size (in pixels)
+    public var orientation: TilemapOrientation                      /// map orientation
+    public var renderOrder: RenderOrder = .RightDown                /// render order
     
     // hexagonal
-    public var hexsidelength: Int = 0                               // hexagonal side length
-    public var staggeraxis: StaggerAxis = .Y                        // stagger axis
-    public var staggerindex: StaggerIndex = .Odd                    // stagger index.
+    public var hexsidelength: Int = 0                               /// hexagonal side length
+    public var staggeraxis: StaggerAxis = .Y                        /// stagger axis
+    public var staggerindex: StaggerIndex = .Odd                    /// stagger index.
     
     // camera overrides
-    public var worldScale: CGFloat = 1.0                            // initial world scale
-    public var allowZoom: Bool = true                               // allow camera zoom
-    public var allowMovement: Bool = true                           // allow camera movement
+    public var worldScale: CGFloat = 1.0                            /// initial world scale
+    public var allowZoom: Bool = true                               /// allow camera zoom
+    public var allowMovement: Bool = true                           /// allow camera movement
     
     // current tile sets
-    public var tileSets: Set<SKTileset> = []                        // tilesets
+    public var tileSets: Set<SKTileset> = []                        /// tilesets
     
     // current layers
-    private var layers: Set<TiledLayerObject> = []                  // layers
-    public var layerCount: Int { return self.layers.count }         // layer count attribute
-    public var properties: [String: String] = [:]                   // custom properties
-    public var zDeltaForLayers: CGFloat = 50                        // z-position range for layers
-    public var backgroundColor: SKColor? = nil                      // optional background color (read from the Tiled file)
-    // default layer
+    private var layers: Set<TiledLayerObject> = []                  /// layers
+    public var layerCount: Int { return self.layers.count }         /// layer count attribute
+    public var properties: [String: String] = [:]                   /// custom properties
+    public var zDeltaForLayers: CGFloat = 50                        /// z-position range for layers
+    public var backgroundColor: SKColor? = nil                      /// optional background color (read from the Tiled file)
+    
+    
+    /** 
+    The tile map default base layer, used for displaying the current grid, getting coordinates, etc.
+    */
     lazy public var baseLayer: SKTileLayer = {
         let layer = SKTileLayer(layerName: "Base", tileMap: self)
         self.addLayer(layer)
@@ -870,6 +884,15 @@ public class SKTilemap: SKNode, SKTiledObject{
     }
     #endif
     
+    /**
+     Returns a mouse event location in negative-y space.
+     
+     *Position is in converted space*
+    
+     - parameter point: `CGPoint` scene point.
+     
+     - returns: `CGPoint` converted point in layer coordinate system.
+     */
     #if os(OSX)
     public func mouseLocation(event: NSEvent) -> CGPoint {
         return baseLayer.mouseLocation(event)
@@ -912,6 +935,14 @@ extension TileCoord: CustomStringConvertible, CustomDebugStringConvertible {
         self.init(Int32(x), Int32(y))
     }
     
+    /**
+     Initialize coordinate with two floats.
+     
+     - parameter x: `CGFloat` x-coordinate.
+     - parameter y: `CGFloat` y-coordinate.
+    
+     - returns: `TileCoord` coordinate.
+     */
     public init(_ x: CGFloat, _ y: CGFloat) {
         self.x = Int32(floor(x))
         self.y = Int32(floor(y))
@@ -937,7 +968,11 @@ extension TileCoord: CustomStringConvertible, CustomDebugStringConvertible {
         return CGPoint(x: Int(x), y: Int(y))
     }
     
-    /// Convert the coordinate to vector2 (for GKGridGraph).
+    /**
+     Return the coordinate as a `int2` vector (for GameplayKit).
+     
+     - returns: `int2` vector.
+     */
     public var vec2: int2 {
         return int2(x, y)
     }

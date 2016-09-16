@@ -14,7 +14,14 @@ import Cocoa
 #endif
 
 
-
+/**
+ Describes the layer type.
+ 
+ - invalid: Layer is invalid.
+ - tile:    Tile-based layers.
+ - object:  Object group.
+ - image:   Image layer.
+ */
 public enum SKTiledLayerType: Int {
     case Invalid    = -1
     case Tile
@@ -31,9 +38,16 @@ public enum ObjectGroupColors: String {
 }
 
 
-// MARK: - Base Layer Class
-
-/// `TiledLayerObject` is the base class for all Tiled layer types.
+/**
+ The `TiledLayerObject` is the base class for all `SKTiled` layer types.
+ 
+ This class doesn't define any object or child types, but manages several important aspects:
+ 
+ - validating coordinates
+ - positioning and alignment
+ - coordinate transformations
+ 
+ */
 public class TiledLayerObject: SKNode, SKTiledObject {
     
     public var layerType: SKTiledLayerType = .Invalid
@@ -153,10 +167,12 @@ public class TiledLayerObject: SKNode, SKTiledObject {
     // MARK: - Init
     
     /**
-     Initialize from the parser.
+     Initialize via the parser.
+     
+     *This intializer is meant to be called by the `SKTilemapParser`, you should not use it directly.*
      
      - parameter layerName:  `String` layer name.
-     - parameter tileMap:    `SKTilemap` parent tilemap node.
+     - parameter tilemap:    `SKTilemap` parent tilemap node.
      - parameter attributes: `[String: String]` dictionary of layer attributes.
      
      - returns: `TiledLayerObject?` tiled layer, if initialization succeeds.
@@ -231,8 +247,9 @@ public class TiledLayerObject: SKNode, SKTiledObject {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Color
     /**
-     Set the layer color.
+     Set the layer color with an `SKColor`.
      
      - parameter color: `SKColor` object color.
      */
@@ -342,7 +359,7 @@ public class TiledLayerObject: SKNode, SKTiledObject {
     }
     
     /**
-     Converts a tile coordinate from a point in map space.
+     Converts a point in map space to tile coordinate.
      
      - parameter point: `CGPoint` point in map space.
      
@@ -382,7 +399,7 @@ public class TiledLayerObject: SKNode, SKTiledObject {
     }
     
     /**
-     Converts a screen point to a tile coordinate.
+     Converts a screen point to a tile coordinate. Note that this function
      expects scene points to be inverted in y before being passed as input.
      
      - parameter point: `CGPoint` point in screen space.
@@ -526,10 +543,10 @@ public class TiledLayerObject: SKNode, SKTiledObject {
     /**
      Converts a coordinate in map space to screen space.
      see: http://stackoverflow.com/questions/24747420/tiled-map-editor-size-of-isometric-tile-side
+     
      - parameter point: `CGPoint` point in map space.
      
      - returns: `CGPoint` point in screen space.
-
      */
     public func pixelToScreenCoords(point: CGPoint) -> CGPoint {
         switch orientation {
@@ -647,8 +664,25 @@ public class TiledLayerObject: SKNode, SKTiledObject {
 }
 
 
-// MARK: - Tiled Layer
+// MARK: - Tile Layer
 
+/**
+ The `SKTileLayer` class  manages an array of tiles (sprites) that it renders as a single image.
+ 
+ This class manages setting and querying tile data.
+ 
+ Accessing a tile:
+ 
+ ```swift
+ let tile = tileLayer.tileAt(2, 6)!
+ ```
+ 
+ Getting tiles of a certain type:
+ 
+ ```swift
+ let floorTiles = tileLayer.getTiles(ofType: "Floor")
+ ```
+ */
 public class SKTileLayer: TiledLayerObject {
     
     private typealias TilesArray = Array2D<SKTile>
@@ -658,12 +692,26 @@ public class SKTileLayer: TiledLayerObject {
     public var render: Bool = false                 // render tile layer as a single image
     
     // MARK: - Init
+    /**
+     Initialize with layer name and parent `SKTilemap`.
+     
+     - parameter layerName:    `String` layer name.
+     - parameter tilemap:      `SKTilemap` parent map.
+     */
     override public init(layerName: String, tileMap: SKTilemap) {
         self.tiles = TilesArray(columns: Int(tileMap.size.width), rows: Int(tileMap.size.height))
         super.init(layerName: layerName, tileMap: tileMap)
         self.layerType = .Tile
     }
     
+    /**
+     Initialize with parent `SKTilemap` and layer attributes.
+     
+     **Do not use this intializer directly**
+     
+     - parameter tilemap:      `SKTilemap` parent map.
+     - parameter attributes:   `[String: String]` layer attributes.
+     */
     public init?(tileMap: SKTilemap, attributes: [String: String]) {
         // name, width and height are required
         guard let layerName = attributes["name"] else { return nil }
@@ -761,6 +809,25 @@ public class SKTileLayer: TiledLayerObject {
         return result
     }
     
+    /**
+     Returns tiles with a property of the given type.
+     
+     - parameter type: `String` type.
+     
+     - returns: `[SKTile]` array of tiles.
+     */
+    public func getTileDataWithProperty(named: String) -> [SKTilesetData] {
+        var result: [SKTilesetData] = []
+        for tile in tiles {
+            if let tile = tile {
+                if tile.tileData.hasKey(named) && !result.contains(tile.tileData) {
+                    result.append(tile.tileData)
+                }
+            }
+        }
+        return result
+    }
+    
     // MARK: - Layer Data
     
     /**
@@ -777,8 +844,6 @@ public class SKTileLayer: TiledLayerObject {
         }
         
         var errorCount: Int = 0
-        
-        // render the layer in the background
         for index in data.indices {
             let gid = data[index]
             
@@ -793,10 +858,57 @@ public class SKTileLayer: TiledLayerObject {
             }
         }
         
+        
         if (errorCount != 0){
             print("[SKTileLayer]: \(errorCount) \(errorCount > 1 ? "errors" : "error") loading data.")
         }
         return errorCount == 0
+    }
+    
+    /*
+     Build an empty tile at the given coordinates. Returns an existing tile if one already exists,
+     or nil if the coordinate is invalid.
+     
+     - parameter x:   `Int` x-coordinate
+     - parameter y:   `Int` y-coordinate
+     - returns: `SKTile` tile.
+     */
+    public func addTileAt(x: Int, _ y: Int) -> SKTile? {
+        let coord = TileCoord(x, y)
+        return addTileAt(coord)
+    }
+    
+    /*
+     Build an empty tile at the given coordinates. Returns an existing tile if one already exists, 
+     or nil if the coordinate is invalid.
+     
+     - parameter coord:   `TileCoord` tile coordinate
+     - returns: `SKTile` tile.
+     */
+    public func addTileAt(coord: TileCoord) -> SKTile? {
+        guard isValid(coord) else { return nil }
+        
+        let current = tileAt(coord)
+        if let current = current {
+            current.removeFromParent()
+            self.tiles[Int(coord.x), Int(coord.y)] = nil
+    }
+
+        let tile = SKTile(tileSize: tileSize)
+    
+        // set the tile overlap amount
+        tile.setTileOverlap(tilemap.tileOverlap)
+        tile.highlightColor = highlightColor
+        
+        // set the layer property
+        tile.layer = self
+        self.tiles[Int(coord.x), Int(coord.y)] = tile
+        
+        // get the position in the layer (plus tileset offset)
+        let tilePosition = pointForCoordinate(coord, offsetX: offset.x, offsetY: offset.y)
+        tile.position = tilePosition
+        addChild(tile)
+        return tile
     }
     
     /**

@@ -39,7 +39,6 @@
 		4C18F0971D90A2DE009120A0 /* roguelike-16x16-anim.tsx in Resources */ = {isa = PBXBuildFile; fileRef = 4CD6D2D41D8B9DE20083DA7B /* roguelike-16x16-anim.tsx */; };
 		4C18F0981D90A2EB009120A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C18F0611D90A21F009120A0 /* AppDelegate.swift */; };
 		4C18F0991D90A2EE009120A0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C18F0621D90A21F009120A0 /* MainMenu.xib */; };
-		4C18F09A1D90A2F3009120A0 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C18F0641D90A21F009120A0 /* Info.plist */; };
 		4C88E18C1D8A1BC400FCCFA3 /* roguelike-16x16.tmx in Resources */ = {isa = PBXBuildFile; fileRef = 4C88E18B1D8A1BC400FCCFA3 /* roguelike-16x16.tmx */; };
 		4C88E1AB1D8A241F00FCCFA3 /* ortho4-16x16.tmx in Resources */ = {isa = PBXBuildFile; fileRef = 4C88E1AA1D8A241F00FCCFA3 /* ortho4-16x16.tmx */; };
 		4C88E1AD1D8A242F00FCCFA3 /* ortho4-16x16.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C88E1AC1D8A242F00FCCFA3 /* ortho4-16x16.png */; };
@@ -306,7 +305,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Michael Fessenden";
 				TargetAttributes = {
 					4C18F0681D90A2BF009120A0 = {
@@ -352,7 +351,6 @@
 				4C18F0931D90A2DE009120A0 /* isometric-130x230.png in Resources */,
 				4C18F0971D90A2DE009120A0 /* roguelike-16x16-anim.tsx in Resources */,
 				4C18F0921D90A2DE009120A0 /* isometric-16x8.png in Resources */,
-				4C18F09A1D90A2F3009120A0 /* Info.plist in Resources */,
 				4C18F08E1D90A2DE009120A0 /* ortho4-16x16.tmx in Resources */,
 				4C18F0951D90A2DE009120A0 /* roguelike-16x16-anim.png in Resources */,
 				4C18F08F1D90A2DE009120A0 /* roguelike-16x16.tmx in Resources */,
@@ -517,8 +515,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -563,8 +563,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -583,6 +585,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};

@@ -15,6 +15,16 @@ public struct AnimationFrame {
 
 
 /// Represents a single tileset tile data, with texture, id and properties
+/**
+ The `SKTilesetData` is the base class for all `SKTiled` layer types.
+ 
+ This class doesn't define any object or child types, but manages several important aspects:
+ 
+ - validating coordinates
+ - positioning and alignment
+ - coordinate transformations
+ 
+ */
 public class SKTilesetData: SKTiledObject  {
     
     weak public var tileset: SKTileset!             // is assigned on add

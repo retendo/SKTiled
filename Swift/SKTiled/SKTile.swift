@@ -9,12 +9,14 @@
 import SpriteKit
 
 
-/// represents a single tile object.
+/**
+ Custom sprite type for rendering tile objects. Tile data (including texture) stored in `SKTilesetData` property.
+ */
 public class SKTile: SKSpriteNode {
     
     weak public var layer: SKTileLayer!                         // layer parent, assigned on add
     private var tileOverlap: CGFloat = 1.5                      // tile overlap amount
-    private var maxOverlap: CGFloat = 3.0               // maximum tile overlap
+    private var maxOverlap: CGFloat = 3.0                       // maximum tile overlap
     public var tileData: SKTilesetData                          // tile data
     public var tileSize: CGSize                                 // tile size
     public var highlightColor: SKColor = SKColor.whiteColor()   // tile highlight color
@@ -313,38 +315,38 @@ public extension SKTile {
         let orientation = tileData.tileset.tilemap.orientation
         
         if orientation == .Orthogonal {
-            childNodeWithName("HIGHLIGHT")?.removeFromParent()
+            childNodeWithName("Highlight")?.removeFromParent()
             let highlightNode = SKShapeNode(rectOfSize: tileSize, cornerRadius: 0)
             highlightNode.strokeColor = highlight.colorWithAlphaComponent(0.1)
             highlightNode.fillColor = highlight.colorWithAlphaComponent(0.35)
-            highlightNode.name = "HIGHLIGHT"
+            highlightNode.name = "Highlight"
             
             highlightNode.antialiased = antialiasing
             addChild(highlightNode)
             highlightNode.zPosition = zPosition + 10
             
             // fade out highlight
-            removeActionForKey("HIGHLIGHT_FADE")
+            removeActionForKey("Highlight")
             let fadeAction = SKAction.sequence([
                 SKAction.waitForDuration(duration * 1.5),
                 SKAction.fadeAlphaTo(0, duration: duration/4.0)
                 ])
             
-            highlightNode.runAction(fadeAction, withKey: "HIGHLIGHT_FADE", optionalCompletion: {
+            highlightNode.runAction(fadeAction, withKey: "Highlight_Fade", optionalCompletion: {
                 highlightNode.removeFromParent()
             })
         }
         
         if orientation == .Isometric {
-            removeActionForKey("HIGHLIGHT_FADE")
+            removeActionForKey("Highlight_Fade")
             let fadeOutAction = SKAction.colorizeWithColor(SKColor.clearColor(), colorBlendFactor: 1, duration: duration)
-            runAction(fadeOutAction, withKey: "HIGHLIGHT_FADE", optionalCompletion: {
+            runAction(fadeOutAction, withKey: "Highlight_Fade", optionalCompletion: {
                 let fadeInAction = SKAction.sequence([
                     SKAction.waitForDuration(duration * 1.5),
                     //fadeOutAction.reversedAction()
                     SKAction.colorizeWithColor(SKColor.clearColor(), colorBlendFactor: 0, duration: duration/4.0)
                     ])
-                self.runAction(fadeInAction, withKey: "HIGHLIGHT_FADE")
+                self.runAction(fadeInAction, withKey: "Highlight_Fade")
             })
         }
     }
@@ -356,10 +358,10 @@ public extension SKTile {
         let orientation = tileData.tileset.tilemap.orientation
         
         if orientation == .Orthogonal {
-            childNodeWithName("HIGHLIGHT")?.removeFromParent()
+            childNodeWithName("Highlight")?.removeFromParent()
         }
         if orientation == .Isometric {
-            removeActionForKey("HIGHLIGHT")
+            removeActionForKey("Highlight")
         }
     }
 
