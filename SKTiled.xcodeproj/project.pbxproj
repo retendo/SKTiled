@@ -79,7 +79,7 @@
 		4C18F0611D90A21F009120A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4C18F0631D90A21F009120A0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		4C18F0641D90A21F009120A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4C18F0691D90A2BF009120A0 /* SKTiled.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = SKTiled.app; path = macOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C18F0691D90A2BF009120A0 /* SKTiled.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SKTiled.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C88E18B1D8A1BC400FCCFA3 /* roguelike-16x16.tmx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "roguelike-16x16.tmx"; sourceTree = "<group>"; };
 		4C88E1AA1D8A241F00FCCFA3 /* ortho4-16x16.tmx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "ortho4-16x16.tmx"; sourceTree = "<group>"; };
 		4C88E1AC1D8A242F00FCCFA3 /* ortho4-16x16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ortho4-16x16.png"; sourceTree = "<group>"; };
@@ -94,7 +94,7 @@
 		4C88E1DA1D8A4EBE00FCCFA3 /* SKTileset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTileset.swift; sourceTree = "<group>"; };
 		4C88E1DC1D8A4EBE00FCCFA3 /* SKTilesetData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTilesetData.swift; sourceTree = "<group>"; };
 		4CA3DA0D1D8AF07C001E165A /* DemoFiles.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DemoFiles.plist; sourceTree = "<group>"; };
-		4CBA61651D8A048200B31FC1 /* SKTiled.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = SKTiled.app; path = iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CBA61651D8A048200B31FC1 /* SKTiled.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SKTiled.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CBA617E1D8A0A3900B31FC1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4CBA61801D8A0A4600B31FC1 /* roguelike-16x16-anim.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "roguelike-16x16-anim.png"; sourceTree = "<group>"; };
 		4CBA61861D8A0A5700B31FC1 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -478,7 +478,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.supermeerkat.SKTiled;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SKTiled;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 2.3;
 			};
@@ -495,7 +495,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.supermeerkat.SKTiled;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SKTiled;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 2.3;
 			};
@@ -599,7 +599,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Swift/iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.supermeerkat.SKTiled;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SKTiled;
 				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
@@ -612,7 +612,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Swift/iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.supermeerkat.SKTiled;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SKTiled;
 				SWIFT_VERSION = 2.3;
 			};
 			name = Release;

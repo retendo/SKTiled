@@ -315,7 +315,6 @@ public extension SKColor {
      Lightens the color by the given percentage.
      
      - parameter percent: `CGFloat`
-     
      - returns: `SKColor` lightened color.
      */
     public func lighten(by percent: CGFloat) -> SKColor {
@@ -326,7 +325,6 @@ public extension SKColor {
      Darkens the color by the given percentage.
      
      - parameter percent: `CGFloat`
-     
      - returns: `SKColor` darkened color.
      */
     public func darken(by percent: CGFloat) -> SKColor {
@@ -342,6 +340,61 @@ public extension SKColor {
     public func colorWithBrightness(factor: CGFloat) -> SKColor {
         let components = self.hsba
         return SKColor(hue: components.h, saturation: components.s, brightness: components.b * factor, alpha: components.a)
+    }
+    
+    /**
+     Initialize an SKColor with a hexidecimal string.
+     
+     - parameter hexString:  `String` hexidecimal code.
+     - returns: `SKColor`
+     */
+    convenience init(hexString: String) {
+        let hex = hexString.stringByTrimmingCharactersInSet(NSCharacterSet.alphanumericCharacterSet().invertedSet)
+        var int = UInt32()
+        NSScanner(string: hex).scanHexInt(&int)
+        let a, r, g, b: UInt32
+        switch hex.characters.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (24-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (0, 0, 0, 1)
+        }
+        self.init(red: CGFloat(r) / 255, green: CGFloat(g) / 255, blue: CGFloat(b) / 255, alpha: CGFloat(a) / 255)
+    }
+    
+    /// Returns the individual color components.
+    public var components: [CGFloat] {
+        return self.components
+    }
+    
+    /*
+     Blend current color with another `SKColor`.
+     
+     - parameter color:   `SKColor` color to blend.
+     - parameter factor:  `CGFloat` blend factor.
+     - returns: `SKColor` blended color.
+     */
+    public func blend(with color: SKColor, factor s: CGFloat = 0.5) -> SKColor {
+        
+        let r1 = components[0]
+        let g1 = components[1]
+        let b1 = components[2]
+        let a1 = components[3]
+        
+        let r2 = color.components[0]
+        let g2 = color.components[1]
+        let b2 = color.components[2]
+        let a2 = color.components[3]
+        
+        let r = (r1 * s) + (1 - s) * r2
+        let g = (g1 * s) + (1 - s) * g2
+        let b = (b1 * s) + (1 - s) * b2
+        
+        return SKColor(red: r, green: g, blue: b, alpha: 1.0)
     }
 }
 
@@ -432,6 +485,45 @@ public extension String {
      */
     public func substitute(pattern: String, replaceWith: String) -> String {
         return self.stringByReplacingOccurrencesOfString(pattern, withString: replaceWith)
+    }
+    
+    /**
+     Returns an array of hexadecimal components.
+     
+     - returns: `[String]?` hexadecimal components.
+     */
+    public func hexComponents() -> [String?] {
+        let code = self
+        let offset = code.hasPrefix("#") ? 1 : 0
+        let start: String.Index = code.startIndex
+        return [
+            code[start.advancedBy(offset)..<start.advancedBy(offset + 2)],
+            code[start.advancedBy(offset + 2)..<start.advancedBy(offset + 4)],
+            code[start.advancedBy(offset + 4)..<start.advancedBy(offset + 6)]
+        ]
+    }
+    
+    /**
+     Initialize with array of bytes.
+     
+     - parameter bytes: `[UInt8]` byte array.
+     */
+    public init(_ bytes: [UInt8]) {
+        self.init()
+        for b in bytes {
+            self.append(UnicodeScalar(b))
+        }
+    }
+    
+    /**
+     Clean up whitespace & carriage returns.
+     
+     - returns: `String` scrubbed string.
+     */
+    public func scrub() -> String {
+        var scrubbed = self.stringByReplacingOccurrencesOfString("\n", withString: "")
+        scrubbed = scrubbed.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        return scrubbed.stringByReplacingOccurrencesOfString(" ", withString: "")
     }
 }
 

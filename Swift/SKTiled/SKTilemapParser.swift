@@ -674,30 +674,3 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
         return nil
     }
 }
-
-// MARK: - Extensions
-
-public extension String {
-    /**
-     Initialize with array of bytes.
-     
-     - parameter bytes: `[UInt8]` byte array.
-     */
-    public init(_ bytes: [UInt8]) {
-        self.init()
-        for b in bytes {
-            self.append(UnicodeScalar(b))
-        }
-    }
-    
-    /**
-     Clean up whitespace & carriage returns.
-     
-     - returns: `String` scrubbed string.
-     */
-    public func scrub() -> String {
-        var scrubbed = self.stringByReplacingOccurrencesOfString("\n", withString: "")
-        scrubbed = scrubbed.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-        return scrubbed.stringByReplacingOccurrencesOfString(" ", withString: "")
-    }
-}
