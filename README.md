@@ -1,7 +1,8 @@
-![SKTiled](https://github.com/mfessenden/SKTiled/blob/master/docs/img/header.png)
+[![SKTiled](docs/swift/img/header.png)](https://mfessenden.github.io/SKTiled)
 
 **SKTiled** is a simple library for using [Tiled](http://www.mapeditor.org) files with Apple's SpriteKit, allowing the creation of game assets from .tmx files. Inspired by [TilemapKit](http://tilemapkit.com) and written purely in Swift 2.0, I began working on this for a project after the development of TilemapKit was halted. While initially created as an exercise in learning Apple's new programming language, I've decided to open-source it in case others find it helpful.  
 
+Check out the [official documentation](https://mfessenden.github.io/SKTiled).
 
 
 For Swift 2.2+. See [this branch](https://github.com/mfessenden/SKTiled/tree/iOS10) for Swift 3 version.
@@ -14,7 +15,7 @@ For Swift 2.2+. See [this branch](https://github.com/mfessenden/SKTiled/tree/iOS
 
 Simply drag the *SKTiled* directory into your Xcode project, and add the files to your game target:
 
-![Xcode installation](https://github.com/mfessenden/SKTiled/blob/master/docs/img/installation.png)
+![Xcode installation](docs/swift/img/installation.png)
 
 
 Alternately, you can include this directory in your project's workspace.
@@ -63,7 +64,7 @@ Properties like map size & tile size can be accessed via the `SKTilemap.size` an
 **Accessing Tiles**
 
 ```swift
-let tileCoord = TileCoord(7, 12)
+let tileCoord = CGPoint(7, 12)
 let tile = groundLayer.tileAt(coord: tileCoord)
 let tile = groundLayer.tileAt(7, 12)
 ```
@@ -140,7 +141,7 @@ New nodes (any `SKNode` type) can be added directly to any layer:
 
 ```swift
 let newNode = SKNode()
-groundLayer.addNode(newNode, 4, 5, zPosition: 100.0)
+groundLayer.addChild(newNode, 4, 5, zpos: 100.0)
 ```
 
 ## Animated Tiles
