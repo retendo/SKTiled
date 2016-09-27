@@ -21,6 +21,13 @@ public enum ParsingError: ErrorType {
 }
 
 
+internal enum FileType: String {
+    case tmx
+    case tsx
+    case png
+}
+
+
 /**
 The `SKTilemapParser` is a custom `NSXMLParserDelegate` parser for reading Tiled TMX and tileset TSX files.
  
@@ -85,6 +92,13 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
                 parser.delegate = self
                 
                 print("[SKTilemapParser]: reading filename: \"\(currentFileName!)\"")
+                let fileExt = currentFileName.componentsSeparatedByString(".").last!
+                var filetype = "filename"
+                if let ftype = FileType(rawValue: fileExt) {
+                    filetype = ftype.description
+                }
+                
+                print("\n[SKTilemapParser]: reading \(filetype): \"\(currentFileName!)\"")
                 
                 let successs: Bool = parser.parse()
                 // report errors
@@ -142,11 +156,18 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
      */
     private func renderTileLayers() {
         guard let tilemap = tilemap else { return }
+        
         for (uuid, tileData) in self.data {
             guard let tileLayer = tilemap.getLayer(withID: uuid) as? SKTileLayer else { continue }
             // add the layer data...
             tileLayer.setLayerData(tileData)
             tileLayer.parseProperties()
+            
+            // report errors
+            if tileLayer.gidErrors.count > 0 {
+                let gidErrorString : String = tileLayer.gidErrors.reduce("", combine: { "\($0)" == "" ? "\($1)" : "\($0)" + ", " + "\($1)" })
+                print("[SKTilemapParser]: WARNING: layer \"\(tileLayer.name!)\": the following gids could not be found: \(gidErrorString)")
+            }
         }
             
         // reset the data
@@ -621,18 +642,6 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
         //if parseError.code == NSXMLParserError.InternalError {}
     }
     
-    // MARK: Unused
-    public func parser(parser: NSXMLParser, foundAttributeDeclarationWithName attributeName: String, forElement elementName: String, type: String?, defaultValue: String?) {
-    }
-    
-    public func parser(parser: NSXMLParser, foundElementDeclarationWithName elementName: String, model: String) {
-
-    }
-    
-    public func parser(parser: NSXMLParser, foundExternalEntityDeclarationWithName name: String, publicID: String?, systemID: String?) {
-
-    }
-    
     // MARK: - Decoding
     /**
      Scrub CSV data.
@@ -670,5 +679,21 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
     
     private func decompress(zlibData data: String) -> String? {
         return nil
+    }
+}
+
+
+
+
+extension FileType {
+    var description: String {
+        switch self {
+        case .tmx:
+            return "tile map"
+        case .tsx:
+            return "tileset"
+        case .png:
+            return "image"
+        }
     }
 }

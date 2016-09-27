@@ -362,6 +362,7 @@ public extension SKColor {
         self.init(red: CGFloat(r) / 255, green: CGFloat(g) / 255, blue: CGFloat(b) / 255, alpha: CGFloat(a) / 255)
     }
     
+    
     /// Returns the individual color components.
     public var components: [CGFloat] {
         return self.components
@@ -379,12 +380,10 @@ public extension SKColor {
         let r1 = components[0]
         let g1 = components[1]
         let b1 = components[2]
-        let a1 = components[3]
         
         let r2 = color.components[0]
         let g2 = color.components[1]
         let b2 = color.components[2]
-        let a2 = color.components[3]
         
         let r = (r1 * s) + (1 - s) * r2
         let g = (g1 * s) + (1 - s) * g2
@@ -738,6 +737,7 @@ public func lerp(start start: CGVector, end: CGVector, t: CGFloat) -> CGVector {
 }
 */
 
+
 // MARK: - Helper Functions
 
 public func floor(point: CGPoint) -> CGPoint {
@@ -755,7 +755,6 @@ public func normalize(value: CGFloat, _ minimum: CGFloat, _ maximum: CGFloat) ->
  
  - parameter layer: `TiledLayerObject` layer instance.
  - parameter scale: `CGFloat` image scale.
- 
  - returns: `SKTexture?` visual grid texture.
  */
 public func drawGrid(layer: TiledLayerObject,  scale: CGFloat = 1) -> CGImage {
@@ -814,12 +813,13 @@ public func drawGrid(layer: TiledLayerObject,  scale: CGFloat = 1) -> CGImage {
                 case .hexagonal, .staggered:
                     let staggerX = layer.tilemap.staggerX
                     
-                    // this is mirrored in pointForCoordinate
+                    // mirrored in pointForCoordinate
                         xpos += tileWidthHalf
-                        ypos += tileHeightHalf
                         
                     if layer.orientation == .hexagonal {
                     
+                        ypos += tileHeightHalf
+
                         var hexPoints = Array(count: 6, repeatedValue: CGPointZero)
                         var variableSize: CGFloat = 0
                         var r: CGFloat = 0
@@ -856,9 +856,6 @@ public func drawGrid(layer: TiledLayerObject,  scale: CGFloat = 1) -> CGImage {
                     
                     if layer.orientation == .staggered {
                         
-                        xpos += tileWidthHalf
-                        ypos += tileHeightHalf
-                        
                         let points: [CGPoint] = [
                             CGPoint(x: xpos, y: ypos),
                             CGPoint(x: xpos - tileWidthHalf, y: ypos + tileHeightHalf),
@@ -887,7 +884,6 @@ public func drawGrid(layer: TiledLayerObject,  scale: CGFloat = 1) -> CGImage {
  - parameter width:   `CGFloat` rect width.
  - parameter height:  `CGFloat` rect height.
  - parameter origin: `CGPoint` rectangle origin.
- 
  - returns: `[CGPoint]` array of points.
  */
 public func rectPointArray(width: CGFloat, height: CGFloat, origin: CGPoint=CGPointZero) -> [CGPoint] {
@@ -905,7 +901,6 @@ public func rectPointArray(width: CGFloat, height: CGFloat, origin: CGPoint=CGPo
  
  - parameter size:   `CGSize` rect size.
  - parameter origin: `CGPoint` rectangle origin.
- 
  - returns: `[CGPoint]` array of points.
  */
 public func rectPointArray(size: CGSize, origin: CGPoint=CGPointZero) -> [CGPoint] {
@@ -920,7 +915,6 @@ public func rectPointArray(size: CGSize, origin: CGPoint=CGPointZero) -> [CGPoin
  - parameter radius: `CGSize` radius of circle.
  - parameter offset: `CGFloat` rotation offset (45 to return a rectangle).
  - parameter origin: `CGPoint` origin point.
- 
  - returns: `[CGPoint]` array of points.
  */
 public func polygonPointArray(sides: Int, radius: CGSize, offset: CGFloat=0, origin: CGPoint=CGPointZero) -> [CGPoint] {
@@ -947,6 +941,7 @@ public func polygonPointArray(sides: Int, radius: CGSize, offset: CGFloat=0, ori
  
  - parameter points:  `[CGPoint]` polygon points.
  - parameter closed:  `Bool` path should be closed. 
+ - parameter origin: `CGPoint` origin point.
  - returns: `CGPathRef` path from the given points.
  */
 public func polygonPath(points: [CGPoint], closed: Bool=true) -> CGPathRef {
@@ -1043,40 +1038,4 @@ public func bezierPath(points: [CGPoint], closed: Bool=true, alpha: CGFloat=0.75
     }
     if (closed == true) {CGPathCloseSubpath(path)}
     return path
-}
-
-
-public func drawPolygonShape(sides: Int, radius: CGSize, color: SKColor, offset: CGFloat=0, origin: CGPoint=CGPointZero) -> SKShapeNode {
-    let shape = SKShapeNode()
-    shape.path = polygonPath(sides, radius: radius, offset: offset, origin: origin)
-    shape.strokeColor = color
-    shape.fillColor = color.colorWithAlphaComponent(0.25)
-    return shape
-}
-
-
-public func drawPolygonUsingPath(ctx: CGContextRef, sides: Int, radius: CGSize, color: SKColor, offset: CGFloat=0, origin: CGPoint=CGPointZero) {
-    let path = polygonPath(sides, radius: radius, offset: offset, origin: origin)
-    CGContextAddPath(ctx, path)
-    let cgcolor = color.CGColor
-    CGContextSetFillColorWithColor(ctx,cgcolor)
-    CGContextFillPath(ctx)
-}
-
-
-public func drawPolygon(ctx: CGContextRef, sides: Int, radius: CGSize, color: SKColor, offset: CGFloat=0) {
-    let points = polygonPointArray(sides, radius: radius, offset: offset)
-    CGContextAddLines(ctx, points, points.count)
-    
-    let cgcolor = color.CGColor
-    CGContextSetFillColorWithColor(ctx, cgcolor)
-    CGContextFillPath(ctx)
-}
-
-
-public func drawPolygonLayer(sides: Int, radius: CGSize, color: SKColor, offset: CGFloat=0, origin: CGPoint=CGPointZero) -> CAShapeLayer {
-    let shape = CAShapeLayer()
-    shape.path = polygonPath(sides, radius: radius, offset: offset, origin: origin)
-    shape.fillColor = color.CGColor
-    return shape
 }

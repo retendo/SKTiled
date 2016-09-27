@@ -21,8 +21,9 @@ public extension SKTilemap {
                 name = value
             }
             
-            if (attr == "debug") {
+            if ["debug", "debugMode"].contains(attr){
                 debugDraw = boolForKey(value)
+                debugMode = boolForKey(value)
             }
             
             if (attr == "gridColor") {
@@ -128,6 +129,10 @@ public extension TiledLayerObject {
             if (attr == "visible") {
                 visible = boolForKey(attr)
             }
+            
+            if (attr == "antialiasing") {
+                antialiased = boolForKey(attr)
+            }
         }
     }
     
@@ -135,7 +140,6 @@ public extension TiledLayerObject {
      Returns a named property for the layer.
      
      - parameter name: `String` property name.
-     
      - returns: `String?` the property value, or nil if it does not exist.
      */
     public func getValue(forProperty name: String) -> String? {

@@ -14,6 +14,7 @@ import SpriteKit
  */
 public class SKTile: SKSpriteNode {
     
+    /// Reference to the parent layer.
     weak public var layer: SKTileLayer!                         // layer parent, assigned on add
     private var tileOverlap: CGFloat = 1.5                      // tile overlap amount
     private var maxOverlap: CGFloat = 3.0                       // maximum tile overlap
@@ -83,6 +84,16 @@ public class SKTile: SKSpriteNode {
      */
     public func setupDynamics(withSize: CGFloat){
         physicsBody = SKPhysicsBody(rectangleOfSize: CGSize(width: withSize, height: withSize))
+        physicsBody?.dynamic = false
+    }
+    
+    /**
+     Remove tile dynamics body.
+     
+     - parameter withSize: `CGFloat` dynamics body size.
+     */
+    public func removeDynamics(){
+        physicsBody = nil
         physicsBody?.dynamic = false
     }
     
@@ -303,6 +314,19 @@ public class SKTile: SKSpriteNode {
             })
         }
     }
+
+    /**
+     Set the tile's shader.
+     
+     - parameter fileNamed: `String?` shader file name.
+     */
+    public func setTileShader(shaderFile named: String?=nil) {      
+        guard let filename = named else {
+            shader = nil
+            return
+        }
+        shader = SKShader(fileNamed: filename)
+    }
 }
     
 
@@ -325,9 +349,7 @@ public extension SKTile {
         return resultString
     }
     
-    override public var debugDescription: String {
-        return description
-    }
+    override public var debugDescription: String { return description }
     
     /**
      Highlight the tile with a given color.
@@ -389,17 +411,6 @@ public extension SKTile {
         if orientation == .isometric {
             removeActionForKey("Highlight")
         }
-    }
-
-    
-    /**
-     Playground debugging visualization.
-     
-     - returns: `AnyObject` visualization
-     */
-    func debugQuickLookObject() -> AnyObject {
-        let shape = SKShapeNode(rectOfSize: self.tileData.tileset.tileSize)
-        return shape
     }
 }
 

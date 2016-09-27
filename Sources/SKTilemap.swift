@@ -51,15 +51,17 @@ internal enum RenderOrder: String {
 /**
  Tile offset hint for coordinate conversion.
  
- - center:        returns the center of the tile.
- - top:           returns the top of the tile.
- - topLeft:       returns the top left of the tile.
- - topRight:      returns the top left of the tile.
- - bottom:        returns the bottom of the tile.
- - bottomLeft:    returns the bottom left of the tile.
- - bottomRight:   returns the bottom right of the tile.
- - left:          returns the left side of the tile.
- - right:         returns the right side of the tile.
+ ```
+    center:        returns the center of the tile.
+    top:           returns the top of the tile.
+    topLeft:       returns the top left of the tile.
+    topRight:      returns the top left of the tile.
+    bottom:        returns the bottom of the tile.
+    bottomLeft:    returns the bottom left of the tile.
+    bottomRight:   returns the bottom right of the tile.
+    left:          returns the left side of the tile.
+    right:         returns the right side of the tile.
+ ```
  */
 public enum TileOffset: Int {
     case center
@@ -74,25 +76,15 @@ public enum TileOffset: Int {
 }
 
 
-/* Tilemap data encoding */
+/**
+ Tilemap data encoding.
+ */
 internal enum TilemapEncoding: String {
     case base64  = "base64"
     case csv     = "csv"
     case xml     = "xml"
 }
 
-
-// Cardinal direction
-public enum CardinalDirection: Int {
-    case north
-    case northEast
-    case east
-    case southEast
-    case south
-    case southWest
-    case west
-    case northWest
-}
 
 /**
  Alignment hint used to position the layers within the `SKTilemap` node.
@@ -126,8 +118,8 @@ internal enum StaggerAxis: String {
  - odd:  stagger odds.
  */
 internal enum StaggerIndex: String {
-    case even  = "even"
-    case odd   = "odd"
+    case odd   
+    case even
 }
 
 
@@ -189,6 +181,7 @@ public class SKTilemap: SKNode, SKTiledObject{
     }()
     
     // debugging
+    public var debugMode: Bool = false
     public var gridColor: SKColor = SKColor.blackColor()            // color used to visualize the tile grid
     public var frameColor: SKColor = SKColor.blackColor()           // bounding box color
     public var highlightColor: SKColor = SKColor.greenColor()       // color used to highlight tiles
@@ -621,11 +614,16 @@ public class SKTilemap: SKNode, SKTiledObject{
         return nil
     }
     
-    public func indexOf(layer: TiledLayerObject) -> Int {
-        return 0
-    }
+    /**
+     Returns the index of a named layer.
     
-    public func indexOf(layedNamed name: String) -> Int {
+     - parameter named: `String` layer name.
+     - returns: `Int` layer index.
+     */
+    public func indexOf(layedNamed named: String) -> Int {
+        if let layer = getLayer(named: named) {
+            return layer.index
+        }
         return 0
     }
     
@@ -965,14 +963,31 @@ extension LayerPosition: CustomStringConvertible {
 }
 
 
-
 extension SKTilemap {
     
     // convenience properties
     public var width: CGFloat { return size.width }
     public var height: CGFloat { return size.height }
-    public var tileWidth: CGFloat { return tileSize.width }
-    public var tileHeight: CGFloat { return tileSize.height }
+   
+    /// Returns the current tile width
+    public var tileWidth: CGFloat {
+        switch orientation {
+        case .staggered:
+            return CGFloat(Int(tileSize.width) & ~1)
+        default:
+            return tileSize.width
+        }
+    }
+    
+    /// Returns the current tile height
+    public var tileHeight: CGFloat {
+        switch orientation {
+        case .staggered:
+            return CGFloat(Int(tileSize.height) & ~1)
+        default:
+            return tileSize.height
+        }
+    }
     
     public var sizeHalved: CGSize { return CGSize(width: size.width / 2, height: size.height / 2)}
     public var tileWidthHalf: CGFloat { return tileWidth / 2 }
@@ -1016,15 +1031,13 @@ extension SKTilemap {
     public func topLeft(x: CGFloat, _ y: CGFloat) -> CGPoint {
         // pointy-topped
         if (staggerX == false) {
-            // y is odd = 1, y is even = 0
-            // stagger index hash: Int = 0 (even), 1 (odd)
             if Bool((Int(y) & 1) ^ staggerindex.hashValue) {
                 return CGPoint(x: x, y: y - 1)
             } else {
                 return CGPoint(x: x - 1, y: y - 1)
             }
-            // flat-topped
         } else {
+            // if the value of x is odd & stagger index is odd
             if Bool((Int(x) & 1) ^ staggerindex.hashValue) {
                 return CGPoint(x: x - 1, y: y)
             } else {
@@ -1094,34 +1107,6 @@ extension SKTilemap {
     }
     
     override public var debugDescription: String { return description }
-    
-    public var orientationDescription: String {
-        var desc = ""
-        if (orientation == .orthogonal) {
-            desc = "Ortho: "
-        }
-        
-        if (orientation == .isometric) {
-            desc = "Iso: "
-        }
-        
-        if (orientation == .hexagonal) {
-            
-            let axisString = (staggerEven == true) ? "even" : "odd"
-            
-            if staggerX == true {
-                desc += "Hex (flat \(axisString)) side X: \(sideLengthX), "
-            } else {
-                desc += "Hex (pointy \(axisString)) side Y: \(sideLengthY), "
-            }
-            desc += "r: \(sideOffsetX) (offX), h: \(sideOffsetY) (offY), cw: \(columnWidth), rh: \(rowHeight)"
-            
-            if (orientation == .staggered) {
-                desc = "Stagger: "
-            }
-        }
-        return desc
-    }
     
     /// Visualize the current grid & bounds.
     public var debugDraw: Bool {

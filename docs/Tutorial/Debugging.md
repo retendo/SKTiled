@@ -13,20 +13,6 @@ tilemap.debugDraw = true
 By default, object layers are hidden so that you may easily work with them in Tiled, but not see them in your game. To see them, you can either show *all* object layers, or on a layer by layer basis:
 
 
-<<<<<<< HEAD
-    SKTilemap:
-      highlightColor  (SKColor)   - global highlight color.
-      
-
-    TiledLayerObject:
-      highlightColor  (SKColor)   - layer highlight color. 
-      debugDraw       (Bool)      - show the layer boundary shape.
-      showGrid        (Bool)      - show the layer grid.  
-      showGraph       (Bool)      - show the pathfinding graph (if one exists).
-
-    SKTile:
-      highlightColor  (SKColor)   - tile highlight color (used in the `SKTile.drawBounds` method).
-=======
 ```swift
 // show all objects in the scene
 tilemap.showObjects = true
@@ -37,14 +23,13 @@ for layer in tilemap.objectLayers {
     layer.showObjects = true
 }
 ```
->>>>>>> iOS10
 
 ###Visualizing the Tile Grid
 
 To visualize the current grid on any layer type, use the layer's `showGrid` property:
 
 
-![Show Grid](../swift/img/showGrid.gif)
+![Show Grid](https://raw.githubusercontent.com/mfessenden/SKTiled/master/docs/Images/showGrid.gif)
 
 
 ```swift
@@ -116,4 +101,4 @@ Debugging properties for **SKTiled** classes:
       highlightColor  (SKColor)   - tile highlight color (used in the `SKTile.drawBounds` method).
 
 
-Next: [Getting Started](getting-started.html) - [Index](Tutorial.html)
+Next: [Troubleshooting](troubleshooting.html) - [Index](Tutorial.html)

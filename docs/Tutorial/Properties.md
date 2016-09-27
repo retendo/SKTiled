@@ -26,6 +26,7 @@ If you are using the v0.17 of Tiled or newer, *SKTiled* supports the new **color
       antialiasLines      (Bool)      - antialias lines.
 
     TiledLayerObject:
+      antialiasing        (Bool)      - antialias lines.
       hidden              (Bool)      - hide the layer.
       color               (String)    - hex string to override color.
       zPosition           (Float)     - used to manually override layer zPosition.
@@ -49,30 +50,11 @@ If you are using the v0.17 of Tiled or newer, *SKTiled* supports the new **color
     SKTileObject:
       hidden              (Bool)      - hide the object.
       color               (String)    - hex string to override object color.
-<<<<<<< HEAD
-      lineWidth           (Float)     - object line width.   
-=======
       lineWidth           (Float)     - object line width.
       nodeClass           (String)    - object node class**
 
     ** not yet implemented
-
-
->>>>>>> iOS10
- Next: [GameplayKit](gameplaykit.html) - [Index](Tutorial.html)
-
-
-###SKTilemap Colors
-    
-    // setting one of these in the tiled file will apply it to ALL layers
-    gridColor: grid visualization color
-    frameColor: bounding box color
-    highlightColor: layer highlight color
     
     
-###TiledLayerObject Colors
+ Next: [Debugging](debugging.html) - [Index](Tutorial.html)
 
-    color:  object group color
-    gridColor: grid visualization color
-    frameColor: bounding box color
-    highlightColor: layer highlight color

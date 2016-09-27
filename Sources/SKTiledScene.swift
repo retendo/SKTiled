@@ -19,7 +19,9 @@ import SpriteKit
  - parameter tilemap:    `SKTilemap!` tile map node.
  */
 protocol SKTiledSceneDelegate {
-    /// World container node
+    /** 
+     World container node. All Tiled assets are parented to this node.
+    */
     var worldNode: SKNode! { get set }
     /// Custom scene camera.
     var cameraNode: SKTiledSceneCamera! { get set }
@@ -134,9 +136,5 @@ public class SKTiledScene: SKScene, SKTiledSceneDelegate {
             return tilemapNode
         }
         return nil
-    }
-    
-    override public func update(currentTime: CFTimeInterval) {
-        /* Called before each frame is rendered */
     }
 }

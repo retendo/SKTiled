@@ -11,10 +11,10 @@ import SpriteKit
 /** 
  Describes the `SKTileObject` shape type.
  
- -rectangle:  rectangular shape
- -ellipse:    circular shape
- -polygon:    closed polygon
- -polyline:   open polygon
+ - rectangle:  rectangular shape
+ - ellipse:    circular shape
+ - polygon:    closed polygon
+ - polyline:   open polygon
  */
 public enum SKObjectType: String {
     case rectangle
@@ -30,24 +30,22 @@ public enum LabelPosition {
 }
 
 
-
 /**
  The `SKTileObject` object represents a Tiled object type (rectangle, ellipse, polygon & polyline).
  
  When the object is created, points can be added either with an array of `CGPoint` objects, or a string. In order to render the object, the `SKTileObject.getVertices()` method is called, which returns the points that make up the shape.
  */
 public class SKTileObject: SKShapeNode, SKTiledObject {
-
-    weak public var layer: SKObjectGroup!                       // layer parent, assigned on add
-    public var uuid: String = NSUUID().UUIDString               // unique id
-    public var id: Int = 0                                      // object id
-    public var type: String!                                    // object type
-    internal var objectType: SKObjectType = .rectangle          // shape type
     
-    public var points: [CGPoint] = []                           // points that describe object shape
-    
+    weak public var layer: SKObjectGroup!                     // layer parent, assigned on add
+    public var uuid: String = NSUUID().UUIDString             // unique id
+    public var id: Int = 0                                    // object id
+    public var gid: Int!                                      // tile gid
+    public var type: String!                                  // object type
+    internal var objectType: SKObjectType = .rectangle        // shape type
+    public var points: [CGPoint] = []                         // points that describe the object's shape.    
     public var size: CGSize = CGSize.zero
-    public var properties: [String: String] = [:]    // custom properties
+    public var properties: [String: String] = [:]             // custom properties
     
     /// Object opacity
     public var opacity: CGFloat {
@@ -121,6 +119,10 @@ public class SKTileObject: SKShapeNode, SKTiledObject {
         
         if let objType = attributes["type"] {
             type = objType
+        }
+        
+        if let objGID = attributes["gid"] {
+            gid = Int(objGID)!
         }
         
         // Rectangular and ellipse objects need initial points.
@@ -219,12 +221,7 @@ public class SKTileObject: SKShapeNode, SKTiledObject {
             
                 childNodeWithName("Anchor")?.removeFromParent()
                 
-                var anchorRadius = self.lineWidth * 1.75
-                if anchorRadius > layer.tileHeight / 8 {
-                    anchorRadius = layer.tileHeight / 9
-                }
-
-                let anchor = SKShapeNode(circleOfRadius: anchorRadius)
+                let anchor = SKShapeNode(circleOfRadius: self.lineWidth * 2.5)
                 anchor.name = "Anchor"
                 addChild(anchor)
                 anchor.position = vertices[0].invertedY

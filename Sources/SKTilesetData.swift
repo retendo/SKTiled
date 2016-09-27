@@ -8,44 +8,47 @@
 import SpriteKit
 
 
-public struct AnimationFrame {
+/**
+ A simple data structure representing an animated tile frame.
+ 
+ - parameter gid:       `Int` unique tile id.
+ - parameter duration:  `TimeInterval` frame duration.
+  - parameter texture:  `SKTexture?` optional tile texture.
+ */
+internal struct AnimationFrame {
     public var gid: Int = 0
     public var duration: NSTimeInterval = 0
     public var texture: SKTexture? = nil
 }
 
 
-/// Represents a single tileset tile data, with texture, id and properties
 /**
- The `SKTilesetData` is the base class for all `SKTiled` layer types.
+The `SKTilesetData` represents a single tileset tile data, with texture, id and properties:
  
- This class doesn't define any object or child types, but manages several important aspects:
- 
- - validating coordinates
- - positioning and alignment
- - coordinate transformations
- 
+- tile texture
+- tile animation
+- tile orientation
  */
 public class SKTilesetData: SKTiledObject  {
     
-    weak public var tileset: SKTileset!             // is assigned on add
+    weak public var tileset: SKTileset!               // is assigned on add
     public var uuid: String = NSUUID().UUIDString     // unique id
-    public var id: Int = 0                          // tile id
-    public var texture: SKTexture!                  // initial tile texture
-    public var source: String! = nil                // source image name (part of a collections tileset)
-    public var probability: CGFloat = 1.0           // used in Tiled application, might not be useful here.
+    public var id: Int = 0                            // tile id
+    public var texture: SKTexture!                    // initial tile texture
+    public var source: String! = nil                  // source image name (part of a collections tileset)
+    public var probability: CGFloat = 1.0             // used in Tiled application, might not be useful here.
     public var properties: [String: String] = [:]
     
     // animation frames
-    public var frames: [AnimationFrame] = []        // animation frames
+    internal var frames: [AnimationFrame] = []        // animation frames
     public var isAnimated: Bool { return frames.count > 0 }
     
     // flipped flags
-    public var flipHoriz: Bool = false              // tile is flipped horizontally
-    public var flipVert:  Bool = false              // tile is flipped vertically
-    public var flipDiag:  Bool = false              // tile is flipped diagonally
+    public var flipHoriz: Bool = false                // tile is flipped horizontally
+    public var flipVert:  Bool = false                // tile is flipped vertically
+    public var flipDiag:  Bool = false                // tile is flipped diagonally
     
-    public var localID: Int {                       // return the local id for this tile
+    public var localID: Int {                         // return the local id for this tile
         guard let tileset = tileset else { return id }
         return tileset.getLocalID(forGlobalID: id)
     }
@@ -58,7 +61,6 @@ public class SKTilesetData: SKTiledObject  {
      
      - parameter tileId:  `Int` unique tile id.
      - parameter tileSet: `SKTileset` tileset reference.
-     
      - returns: `SKTilesetData` tile data.
      */
     public init(tileId: Int, withTileset tileSet: SKTileset) {
@@ -98,7 +100,7 @@ public class SKTilesetData: SKTiledObject  {
      - parameter gid: `Int` id for frame.
      - returns: `AnimationFrame?` animation frame (if it exists).
      */
-    public func removeFrame(gid: Int) -> AnimationFrame? {
+    func removeFrame(gid: Int) -> AnimationFrame? {
         if let index = frames.indexOf( { $0.gid == gid } ) {
             return frames.removeAtIndex(index)
         }
@@ -112,13 +114,9 @@ public func ==(lhs: SKTilesetData, rhs: SKTilesetData) -> Bool{
 }
 
 
-// Hashable requires == func & hashValue: Int
 extension SKTilesetData: Hashable {
-    public var hashValue: Int {
-        return id.hashValue
-    }
+    public var hashValue: Int { return id.hashValue }
 }
-
 
 
 extension AnimationFrame: CustomStringConvertible, CustomDebugStringConvertible {
@@ -141,7 +139,5 @@ extension SKTilesetData: CustomStringConvertible, CustomDebugStringConvertible {
         return dataString
     }
     
-    public var debugDescription: String {
-        return description
-    }
+    public var debugDescription: String { return description }
 }

@@ -70,7 +70,6 @@ public extension SKTiledObject {
      Returns a string for the given key.
      
      - parameter key: `String` properties key.
-     
      - returns: `String` value for properties key.
      */
     public func stringForKey(key: String) -> String? {
@@ -82,7 +81,6 @@ public extension SKTiledObject {
      
      - parameter key:         `String` properties key.
      - parameter separatedBy: `String` separator.
-     
      - returns: `[String]` value for properties key.
      */
     public func stringArrayForKey(key: String, separatedBy: String=",") -> [String] {
