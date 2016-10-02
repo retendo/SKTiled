@@ -6,7 +6,6 @@
 //  Copyright © 2016 Michael Fessenden. All rights reserved.
 //  Derived from: https://medium.com/@lucascerro/understanding-nsxmlparser-in-swift-xcode-6-3-1-7c96ff6c65bc#.1m4mh6nhy
 
-
 import SpriteKit
 
 
@@ -377,7 +376,6 @@ public class SKTilemapParser: NSObject, NSXMLParserDelegate {
                 tileset.addTextures(fromSpriteSheet: imageSource)
             }
         }
-        
         }
         
         // `tile` is used to flag properties in a tileset, as well as store tile layer data in an XML-formatted map.

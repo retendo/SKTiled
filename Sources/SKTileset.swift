@@ -171,7 +171,6 @@ public class SKTileset: SKTiledObject {
         // invert the y-coord
         var y = margin + rowHeight + rowSpacing - Int(tileSize.height)
         
-        //print("  -> building tileset \"\(name)\", first: \(firstGID)")
         for gid in firstGID..<(firstGID + totalTileCount) {
             let rectStartX = CGFloat(x) / CGFloat(textureWidth)
             let rectStartY = CGFloat(y) / CGFloat(textureHeight)

@@ -45,6 +45,13 @@ internal enum SKObjectGroupColors: String {
  - validating coordinates
  - positioning and alignment
  - coordinate transformations
+ 
+ Layer properties are accessed via properties shared with the parent tilemap:
+ 
+ ```
+  layer.size            // size (in tiles)
+  layer.tileSize        // tile size (in pixels)
+ ```
  */
 public class TiledLayerObject: SKNode, SKTiledObject {
     
@@ -381,6 +388,7 @@ public class TiledLayerObject: SKNode, SKTiledObject {
     
     /**
      Converts a tile coordinate to a coordinate in map space.
+     returns a point that needs to be converted to negative-y space.
      
      - parameter coord: `CGPoint` tile coordinate.
      - returns: `CGPoint` point in map space.
@@ -522,6 +530,7 @@ public class TiledLayerObject: SKNode, SKTiledObject {
     
     /**
      Converts a tile coordinate into a screen point.
+     returns a point that needs to be converted to negative-y space.
      
      - parameter coord: `CGPoint` tile coordinate.     
      - returns: `CGPoint` point in screen space.
@@ -539,6 +548,7 @@ public class TiledLayerObject: SKNode, SKTiledObject {
                            y: (x + y) * tileHeightHalf)
                         
         case .hexagonal, .staggered:
+            
             let tileX = Int(coord.x)
             let tileY = Int(coord.y)
             
@@ -572,6 +582,7 @@ public class TiledLayerObject: SKNode, SKTiledObject {
     
     /**
      Converts a screen (isometric) coordinate to a coordinate in map space.
+     returns a point that needs to be converted to negative-y space.
      
      - parameter point: `CGPoint` point in screen space.
      - returns: `CGPoint` point in map space.
@@ -1493,6 +1504,7 @@ public class TiledLayerGrid: SKSpriteNode {
             texture = nil
             hidden = true
             if (showGrid == true){
+                
                 // get the last z-position
                 zPosition = layer.tilemap.lastZPosition + layer.tilemap.zDeltaForLayers
                 hidden = false
@@ -1504,7 +1516,6 @@ public class TiledLayerGrid: SKSpriteNode {
                     gridTexture = SKTexture(CGImage: gridImage)
                     //let textureFilter: SKTextureFilteringMode = (layer.antialiased == true) ? .linear : .Nearest
                     gridTexture.filteringMode = .Linear
-                    //print("[TiledLayerGrid]: texture filtering: \(textureFilter.rawValue == 0 ? "nearest": "linear")")
                 }
                 
                 
@@ -1563,9 +1574,11 @@ internal struct Array2D<T> {
 
 
 
-// MARK: - Extensions
+
 
 extension TiledLayerObject {
+    
+    // MARK: - Extensions
     
     /**
      Add a node at the given coordinates. By default, the zPositon

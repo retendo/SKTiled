@@ -1139,6 +1139,7 @@ extension SKTilemap {
             if (layer != baseLayer) {
                 let layerName = layer.name!
                 let nameString = "\"\(layerName)\""
+                let indexString = "\(layer.index): ".zfill(4, pattern: " ", padLeft: false)
                 print("\(layer.index): \(layer.layerType.stringValue.capitalizedString.zfill(6, pattern: " ", padLeft: false)) \(nameString.zfill(largestName!.characters.count + 2, pattern: " ", padLeft: false))   pos: \(layer.position.roundTo(1)), size: \(layer.sizeInPoints.roundTo(1)),  offset: \(layer.offset.roundTo(1)), anc: \(layer.anchorPoint.roundTo()), z: \(layer.zPosition.roundTo())")
                 
             }

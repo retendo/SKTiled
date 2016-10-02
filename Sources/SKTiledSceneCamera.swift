@@ -6,7 +6,6 @@
 //  Copyright © 2016 Michael Fessenden. All rights reserved.
 //  Adapted from http://www.avocarrot.com/blog/implement-gesture-recognizers-swift/
 
-
 import SpriteKit
 #if os(iOS)
 import UIKit
